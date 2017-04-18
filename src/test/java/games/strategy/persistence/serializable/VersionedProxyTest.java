@@ -87,7 +87,7 @@ public final class VersionedProxyTest {
     final FakeNonSerializableClass expected =
         new FakeNonSerializableClass(42L, "2112", FakeNonSerializableClassProxy.FIELD4_DEFAULT_VALUE);
 
-    final Object actual = TestProxyUtil.deserializeFromBase16EncodedChars(base16EncodedBytes);
+    final Object actual = TestProxyUtil.deserializeFromBase16EncodedBytes(base16EncodedBytes);
 
     assertThat(actual, is(expected));
   }

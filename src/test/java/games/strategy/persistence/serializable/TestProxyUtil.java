@@ -96,13 +96,13 @@ public final class TestProxyUtil {
     return Splitter.fixedLength(charsPerChunk).splitToList(text);
   }
 
-  private static String toAsciiChars(final String base16EncodedChars) {
-    assert base16EncodedChars.length() % 2 == 0;
+  private static String toAsciiChars(final String base16EncodedBytes) {
+    assert base16EncodedBytes.length() % 2 == 0;
 
     final StringBuilder sb = new StringBuilder();
 
-    for (final String base16EncodedChar : splitIntoFixedLengthChunks(base16EncodedChars, 2)) {
-      final int codePoint = Integer.parseInt(base16EncodedChar, 16);
+    for (final String base16EncodedByte : splitIntoFixedLengthChunks(base16EncodedBytes, 2)) {
+      final int codePoint = Integer.parseInt(base16EncodedByte, 16);
       if ((codePoint >= 0x20) && (codePoint < 0x7F)) {
         sb.appendCodePoint(codePoint);
       } else {
@@ -121,7 +121,7 @@ public final class TestProxyUtil {
    * arbitrary object that may require the support of persistence delegates.
    * </p>
    *
-   * @param base16EncodedChars The base16-encoded serialized representation of the object to deserialize; must not be
+   * @param base16EncodedBytes The base16-encoded serialized representation of the object to deserialize; must not be
    *        {@code null}.
    *
    * @return The deserialized object; may be {@code null}.
@@ -129,15 +129,15 @@ public final class TestProxyUtil {
    * @throws IOException If an I/O error occurs.
    * @throws ClassNotFoundException If the class for an object being restored cannot be found.
    */
-  static Object deserializeFromBase16EncodedChars(final String base16EncodedChars)
+  static Object deserializeFromBase16EncodedBytes(final String base16EncodedBytes)
       throws IOException, ClassNotFoundException {
-    assert base16EncodedChars != null;
+    assert base16EncodedBytes != null;
 
-    return deserialize(decodeBase16(base16EncodedChars));
+    return deserialize(decodeBase16(base16EncodedBytes));
   }
 
-  private static byte[] decodeBase16(final String base16EncodedChars) {
-    return BaseEncoding.base16().decode(base16EncodedChars);
+  private static byte[] decodeBase16(final String base16EncodedBytes) {
+    return BaseEncoding.base16().decode(base16EncodedBytes);
   }
 
   /**
