@@ -18,9 +18,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-/**
- * A fixture for testing the basic aspects of the {@link ObjectOutputStream} class.
- */
 @RunWith(MockitoJUnitRunner.class)
 public final class ObjectOutputStreamTest {
   private ObjectOutputStream oos;
@@ -28,7 +25,7 @@ public final class ObjectOutputStreamTest {
   @Mock
   private PersistenceDelegate persistenceDelegate;
 
-  private final PersistenceDelegateRegistry persistenceDelegateRegistry = new FakePersistenceDelegateRegistry();
+  private final PersistenceDelegateRegistry persistenceDelegateRegistry = new DefaultPersistenceDelegateRegistry();
 
   @Before
   public void setUp() throws Exception {

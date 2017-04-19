@@ -1,6 +1,10 @@
 package games.strategy.persistence.serializable;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 import java.io.ByteArrayInputStream;
@@ -12,14 +16,24 @@ import org.junit.Test;
 
 /**
  * A fixture for testing the basic aspects of classes that implement the {@link PersistenceDelegate} interface.
+ *
+ * @param <T> The type of the subject to be persisted.
  */
-public abstract class AbstractPersistenceDelegateTestCase {
-  private final PersistenceDelegateRegistry persistenceDelegateRegistry = new FakePersistenceDelegateRegistry();
+public abstract class AbstractPersistenceDelegateTestCase<T> {
+  private final PersistenceDelegateRegistry persistenceDelegateRegistry = new DefaultPersistenceDelegateRegistry();
+
+  private final Class<T> type;
 
   /**
    * Initializes a new instance of the {@code AbstractPersistenceDelegateTestCase} class.
+   *
+   * @param type The type of the subject to be persisted; must not be {@code null}.
    */
-  protected AbstractPersistenceDelegateTestCase() {}
+  protected AbstractPersistenceDelegateTestCase(final Class<T> type) {
+    checkNotNull(type);
+
+    this.type = type;
+  }
 
   /**
    * Asserts that the specified subjects are equal.
@@ -29,11 +43,14 @@ public abstract class AbstractPersistenceDelegateTestCase {
    * </p>
    *
    * @param expected The expected subject; must not be {@code null}.
-   * @param actual The actual subject; may be {@code null}.
+   * @param actual The actual subject; must not be {@code null}.
    *
    * @throws AssertionError If the two subjects are not equal.
    */
-  protected void assertSubjectEquals(final Object expected, final Object actual) {
+  protected void assertSubjectEquals(final T expected, final T actual) {
+    checkNotNull(expected);
+    checkNotNull(actual);
+
     assertThat(actual, is(expected));
   }
 
@@ -42,7 +59,7 @@ public abstract class AbstractPersistenceDelegateTestCase {
    *
    * @return The subject to be persisted; never {@code null}.
    */
-  protected abstract Object createSubject();
+  protected abstract T createSubject();
 
   /**
    * Registers the persistence delegates required for the subject to be persisted.
@@ -59,7 +76,7 @@ public abstract class AbstractPersistenceDelegateTestCase {
     }
   }
 
-  private void writeObject(final ByteArrayOutputStream baos, final Object obj) throws Exception {
+  private void writeObject(final ByteArrayOutputStream baos, final T obj) throws Exception {
     try (final ObjectOutputStream oos = new ObjectOutputStream(baos, persistenceDelegateRegistry)) {
       oos.writeObject(obj);
     }
@@ -81,12 +98,16 @@ public abstract class AbstractPersistenceDelegateTestCase {
 
   @Test
   public void persistenceDelegate_ShouldBeAbleToRoundTripSubject() throws Exception {
-    final Object obj = createSubject();
+    final T expected = createSubject();
+    assertThat(expected, is(not(nullValue())));
     final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-    writeObject(baos, obj);
-    final Object deserializedObj = readObject(baos);
+    writeObject(baos, expected);
+    final Object untypedActual = readObject(baos);
 
-    assertSubjectEquals(obj, deserializedObj);
+    assertThat(untypedActual, is(not(nullValue())));
+    assertThat(untypedActual, is(instanceOf(type)));
+    final T actual = type.cast(untypedActual);
+    assertSubjectEquals(expected, actual);
   }
 }

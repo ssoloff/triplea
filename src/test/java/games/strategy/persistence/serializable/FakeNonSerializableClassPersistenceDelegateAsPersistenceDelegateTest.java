@@ -1,13 +1,13 @@
 package games.strategy.persistence.serializable;
 
-/**
- * A fixture for testing the {@link FakeNonSerializableClassPersistenceDelegate} class to ensure it does not violate the
- * contract of the {@link PersistenceDelegate} interface.
- */
 public final class FakeNonSerializableClassPersistenceDelegateAsPersistenceDelegateTest
-    extends AbstractPersistenceDelegateTestCase {
+    extends AbstractPersistenceDelegateTestCase<FakeNonSerializableClass> {
+  public FakeNonSerializableClassPersistenceDelegateAsPersistenceDelegateTest() {
+    super(FakeNonSerializableClass.class);
+  }
+
   @Override
-  protected Object createSubject() {
+  protected FakeNonSerializableClass createSubject() {
     return new FakeNonSerializableClass(2112, "42");
   }
 

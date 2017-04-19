@@ -16,12 +16,12 @@ import java.util.Date;
 import org.junit.Test;
 
 /**
- * A fixture for testing the interaction between the {@link ObjectInputStream} and {@link ObjectOutputStream} classes.
+ * A fixture for testing the integration between the {@link ObjectInputStream} and {@link ObjectOutputStream} classes.
  */
-public final class ObjectStreamTest {
+public final class ObjectInputOutputStreamIntegrationTest {
   private final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-  private final PersistenceDelegateRegistry persistenceDelegateRegistry = new FakePersistenceDelegateRegistry();
+  private final PersistenceDelegateRegistry persistenceDelegateRegistry = new DefaultPersistenceDelegateRegistry();
 
   private Object readObject() throws Exception {
     try (final InputStream is = new ByteArrayInputStream(baos.toByteArray());
@@ -37,7 +37,7 @@ public final class ObjectStreamTest {
   }
 
   @Test
-  public void objectStreams_ShouldBeAbleToRoundTripNull() throws Exception {
+  public void objectInputAndOutputStreams_ShouldBeAbleToRoundTripNull() throws Exception {
     writeObject(null);
     final Object deserializedObj = readObject();
 
@@ -45,7 +45,8 @@ public final class ObjectStreamTest {
   }
 
   @Test
-  public void objectStreams_ShouldBeAbleToRoundTripSerializableObjectWithoutPersistenceDelegate() throws Exception {
+  public void objectInputAndOutputStreams_ShouldBeAbleToRoundTripSerializableObjectWithoutPersistenceDelegate()
+      throws Exception {
     final Date obj = new Date();
 
     writeObject(obj);
@@ -55,7 +56,8 @@ public final class ObjectStreamTest {
   }
 
   @Test
-  public void objectStreams_ShouldBeAbleToRoundTripNonSerializableObjectWithPersistenceDelegate() throws Exception {
+  public void objectInputAndOutputStreams_ShouldBeAbleToRoundTripNonSerializableObjectWithPersistenceDelegate()
+      throws Exception {
     persistenceDelegateRegistry.registerPersistenceDelegate(
         FakeNonSerializableClass.class, new FakeNonSerializableClassPersistenceDelegate());
     final FakeNonSerializableClass obj = new FakeNonSerializableClass(2112, "42");

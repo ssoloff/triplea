@@ -10,13 +10,13 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Fake implementation of {@link IPersistenceDelegateRegistry}.
+ * Default implementation of {@link PersistenceDelegateRegistry}.
  *
  * <p>
  * Instances of this class are not thread safe.
  * </p>
  */
-public final class FakePersistenceDelegateRegistry implements PersistenceDelegateRegistry {
+public final class DefaultPersistenceDelegateRegistry implements PersistenceDelegateRegistry {
   private final Map<String, PersistenceDelegate> persistenceDelegatesByTypeName = new HashMap<>();
 
   @Override

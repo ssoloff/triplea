@@ -22,9 +22,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-/**
- * A fixture for testing the basic aspects of the {@link VersionedProxySupport} class.
- */
 @RunWith(MockitoJUnitRunner.class)
 public final class VersionedProxySupportTest {
   @Mock
