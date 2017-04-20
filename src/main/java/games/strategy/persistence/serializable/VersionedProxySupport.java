@@ -80,16 +80,16 @@ public final class VersionedProxySupport {
     final Method method = getProxyReadHandlerForVersion(version);
     try {
       method.invoke(proxy, in);
-    } catch (final InvocationTargetException ex) { // TODO: rename "e"
-      final Throwable cause = ex.getCause();
+    } catch (final InvocationTargetException e) {
+      final Throwable cause = e.getCause();
       if (cause instanceof IOException) {
         throw (IOException) cause;
       } else if (cause instanceof ClassNotFoundException) {
         throw (ClassNotFoundException) cause;
       }
       throw TaskUtil.launderThrowable(cause);
-    } catch (final IllegalAccessException ex) { // TODO: rename "e"
-      throw new AssertionError("should never occur (access checks suppressed)", ex);
+    } catch (final IllegalAccessException e) {
+      throw new AssertionError("should never occur (access checks suppressed)", e);
     }
   }
 
@@ -110,7 +110,7 @@ public final class VersionedProxySupport {
           && Void.TYPE.equals(method.getReturnType())) {
         return method;
       }
-    } catch (final NoSuchMethodException ex) { // TODO: rename "e"
+    } catch (final NoSuchMethodException e) {
       // fall through
     }
 
@@ -137,14 +137,14 @@ public final class VersionedProxySupport {
     final Method method = getProxyWriteHandlerForVersion(version);
     try {
       method.invoke(proxy, out);
-    } catch (final InvocationTargetException ex) { // TODO: rename "e"
-      final Throwable cause = ex.getCause();
+    } catch (final InvocationTargetException e) {
+      final Throwable cause = e.getCause();
       if (cause instanceof IOException) {
         throw (IOException) cause;
       }
       throw TaskUtil.launderThrowable(cause);
-    } catch (final IllegalAccessException ex) { // TODO: rename "e"
-      throw new AssertionError("should never occur (access checks suppressed)", ex);
+    } catch (final IllegalAccessException e) {
+      throw new AssertionError("should never occur (access checks suppressed)", e);
     }
   }
 

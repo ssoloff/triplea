@@ -131,8 +131,8 @@ public final class GameDataMemento {
       @SuppressWarnings("unchecked")
       final Map<String, Object> attributes = (Map<String, Object>) memento;
       return attributes;
-    } catch (final ClassCastException ex) { // TODO: rename "e"
-      throw new GameDataMementoException("memento has wrong type", ex);
+    } catch (final ClassCastException e) {
+      throw new GameDataMementoException("memento has wrong type", e);
     }
   }
 
@@ -162,8 +162,8 @@ public final class GameDataMemento {
 
     try {
       return type.cast(attributes.get(name));
-    } catch (final ClassCastException ex) { // TODO: rename "e"
-      throw new GameDataMementoException(String.format("memento attribute '%s' has wrong type", name), ex);
+    } catch (final ClassCastException e) {
+      throw new GameDataMementoException(String.format("memento attribute '%s' has wrong type", name), e);
     }
   }
 }

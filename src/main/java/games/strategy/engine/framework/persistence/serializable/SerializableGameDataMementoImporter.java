@@ -35,8 +35,8 @@ public final class SerializableGameDataMementoImporter {
         final ObjectInputStream ois = ObjectStreams.newObjectInputStream(gzipis)) {
       readMetadata(ois);
       return readGameDataMemento(ois);
-    } catch (final IOException | ClassNotFoundException ex) { // TODO: rename "e"
-      throw new SerializableGameDataMementoImportException(ex);
+    } catch (final IOException | ClassNotFoundException e) {
+      throw new SerializableGameDataMementoImportException(e);
     }
   }
 

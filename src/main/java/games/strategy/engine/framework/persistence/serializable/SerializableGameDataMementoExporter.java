@@ -36,8 +36,8 @@ public final class SerializableGameDataMementoExporter {
         final ObjectOutputStream oos = ObjectStreams.newObjectOutputStream(gzipos)) {
       writeMetadata(oos);
       writeGameDataMemento(oos, gameDataMemento);
-    } catch (final IOException ex) { // TODO: rename to "e"
-      throw new SerializableGameDataMementoExportException(ex);
+    } catch (final IOException e) {
+      throw new SerializableGameDataMementoExportException(e);
     }
   }
 

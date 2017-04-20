@@ -39,20 +39,20 @@ public final class TaskUtil {
    * }
    * </pre>
    *
-   * @param tt The unknown cause of a task execution exception; may be {@code null}.
+   * @param t The unknown cause of a task execution exception; may be {@code null}.
    *
    * @return The unchecked exception which caused the task execution exception.
    *
    * @throws Error If the cause was an error.
    * @throws IllegalStateException If the cause was a checked exception.
    */
-  public static RuntimeException launderThrowable(final Throwable tt) { // TODO: rename to "t"
-    if (tt instanceof RuntimeException) {
-      return (RuntimeException) tt;
-    } else if (tt instanceof Error) {
-      throw (Error) tt;
+  public static RuntimeException launderThrowable(final Throwable t) {
+    if (t instanceof RuntimeException) {
+      return (RuntimeException) t;
+    } else if (t instanceof Error) {
+      throw (Error) t;
     }
 
-    throw new IllegalStateException("unexpected checked exception", tt);
+    throw new IllegalStateException("unexpected checked exception", t);
   }
 }
