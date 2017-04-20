@@ -15,34 +15,34 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import games.strategy.engine.data.GameData;
+import games.strategy.engine.data.TestGameDataMementoFactory;
 
 @RunWith(MockitoJUnitRunner.class)
-public final class SerializableGameDataExporterTest {
-  private final SerializableGameDataExporter exporter = new SerializableGameDataExporter();
+public final class SerializableGameDataMementoExporterTest {
+  private final SerializableGameDataMementoExporter exporter = new SerializableGameDataMementoExporter();
 
-  private final GameData gameData = new GameData();
+  private final Object gameDataMemento = TestGameDataMementoFactory.newValidGameDataMemento();
 
   @Mock
   private OutputStream os;
 
   @Test
-  public void exportGameData_ShouldThrowExceptionWhenGameDataIsNull() {
-    catchException(() -> exporter.exportGameData(null, os));
+  public void exportGameDataMemento_ShouldThrowExceptionWhenGameDataMementoIsNull() {
+    catchException(() -> exporter.exportGameDataMemento(null, os));
 
     assertThat(caughtException(), is(instanceOf(NullPointerException.class)));
   }
 
   @Test
-  public void exportGameData_ShouldThrowExceptionWhenOutputStreamIsNull() {
-    catchException(() -> exporter.exportGameData(gameData, null));
+  public void exportGameDataMemento_ShouldThrowExceptionWhenOutputStreamIsNull() {
+    catchException(() -> exporter.exportGameDataMemento(gameDataMemento, null));
 
     assertThat(caughtException(), is(instanceOf(NullPointerException.class)));
   }
 
   @Test
-  public void exportGameData_ShouldNotCloseOutputStream() throws Exception {
-    exporter.exportGameData(gameData, os);
+  public void exportGameDataMemento_ShouldNotCloseOutputStream() throws Exception {
+    exporter.exportGameDataMemento(gameDataMemento, os);
 
     verify(os, never()).close();
   }

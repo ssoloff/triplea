@@ -312,7 +312,7 @@ public class GameData implements java.io.Serializable {
     this.loader = loader;
   }
 
-  public void setGameVersion(final Version gameVersion) {
+  void setGameVersion(final Version gameVersion) {
     this.gameVersion = gameVersion;
   }
 
@@ -320,7 +320,7 @@ public class GameData implements java.io.Serializable {
     return gameVersion;
   }
 
-  public void setGameName(final String gameName) {
+  void setGameName(final String gameName) {
     this.gameName = gameName;
   }
 

@@ -16,30 +16,31 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
+import java.util.zip.GZIPOutputStream;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import games.strategy.engine.data.GameData;
+import games.strategy.engine.data.TestGameDataMementoFactory;
 
 @RunWith(MockitoJUnitRunner.class)
-public final class SerializableGameDataImporterTest {
-  private final GameData gameData = new GameData();
+public final class SerializableGameDataMementoImporterTest {
+  private final Object gameDataMemento = TestGameDataMementoFactory.newValidGameDataMemento();
 
-  private final SerializableGameDataImporter importer = new SerializableGameDataImporter();
+  private final SerializableGameDataMementoImporter importer = new SerializableGameDataMementoImporter();
 
   @Test
-  public void importGameData_ShouldThrowExceptionWhenInputStreamIsNull() {
-    catchException(() -> importer.importGameData(null));
+  public void importGameDataMemento_ShouldThrowExceptionWhenInputStreamIsNull() {
+    catchException(() -> importer.importGameDataMemento(null));
 
     assertThat(caughtException(), is(instanceOf(NullPointerException.class)));
   }
 
   @Test
-  public void importGameData_ShouldNotCloseInputStream() throws Exception {
+  public void importGameDataMemento_ShouldNotCloseInputStream() throws Exception {
     try (final InputStream is = spy(newInputStreamWithValidContent())) {
-      importer.importGameData(is);
+      importer.importGameDataMemento(is);
 
       verify(is, never()).close();
     }
@@ -47,51 +48,53 @@ public final class SerializableGameDataImporterTest {
 
   private InputStream newInputStreamWithValidContent() throws Exception {
     try (final ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-      final SerializableGameDataExporter exporter = new SerializableGameDataExporter();
-      exporter.exportGameData(gameData, baos);
+      final SerializableGameDataMementoExporter exporter = new SerializableGameDataMementoExporter();
+      exporter.exportGameDataMemento(gameDataMemento, baos);
       return new ByteArrayInputStream(baos.toByteArray());
     }
   }
 
   @Test
-  public void importGameData_ShouldThrowExceptionWhenMetadataMimeTypeIllegal() throws Exception {
+  public void importGameDataMemento_ShouldThrowExceptionWhenMetadataMimeTypeIllegal() throws Exception {
     try (final InputStream is = spy(newInputStreamWithIllegalMetadataMimeType())) {
-      catchException(() -> importer.importGameData(is));
+      catchException(() -> importer.importGameDataMemento(is));
 
       assertThat(caughtException(), allOf(
-          is(instanceOf(SerializableGameDataImportException.class)),
+          is(instanceOf(SerializableGameDataMementoImportException.class)),
           hasMessageThat(containsString("illegal MIME type"))));
     }
   }
 
   private InputStream newInputStreamWithIllegalMetadataMimeType() throws Exception {
     try (final ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-      try (final ObjectOutputStream oos = ObjectStreams.newObjectOutputStream(baos)) {
+      try (final GZIPOutputStream gzipos = new GZIPOutputStream(baos);
+          final ObjectOutputStream oos = ObjectStreams.newObjectOutputStream(gzipos)) {
         oos.writeUTF("application/octet-stream");
         oos.writeLong(SerializableConstants.CURRENT_VERSION);
-        oos.writeObject(gameData);
+        oos.writeObject(gameDataMemento);
       }
       return new ByteArrayInputStream(baos.toByteArray());
     }
   }
 
   @Test
-  public void importGameData_ShouldThrowExceptionWhenMetadataVersionIncompatible() throws Exception {
+  public void importGameDataMemento_ShouldThrowExceptionWhenMetadataVersionIncompatible() throws Exception {
     try (final InputStream is = spy(newInputStreamWithIncompatibleMetadataVersion())) {
-      catchException(() -> importer.importGameData(is));
+      catchException(() -> importer.importGameDataMemento(is));
 
       assertThat(caughtException(), allOf(
-          is(instanceOf(SerializableGameDataImportException.class)),
+          is(instanceOf(SerializableGameDataMementoImportException.class)),
           hasMessageThat(containsString("incompatible version"))));
     }
   }
 
   private InputStream newInputStreamWithIncompatibleMetadataVersion() throws Exception {
     try (final ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-      try (final ObjectOutputStream oos = ObjectStreams.newObjectOutputStream(baos)) {
+      try (final GZIPOutputStream gzipos = new GZIPOutputStream(baos);
+          final ObjectOutputStream oos = ObjectStreams.newObjectOutputStream(gzipos)) {
         oos.writeUTF(SerializableConstants.MIME_TYPE);
         oos.writeLong(-1L);
-        oos.writeObject(gameData);
+        oos.writeObject(gameDataMemento);
       }
       return new ByteArrayInputStream(baos.toByteArray());
     }
