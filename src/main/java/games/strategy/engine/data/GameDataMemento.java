@@ -6,21 +6,25 @@ import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import com.google.common.annotations.VisibleForTesting;
 
 import games.strategy.util.Version;
+import games.strategy.util.memento.MementoExporter;
+import games.strategy.util.memento.MementoImportException;
+import games.strategy.util.memento.MementoImporter;
+import games.strategy.util.memento.PropertyBagMementoExporter;
+import games.strategy.util.memento.PropertyBagMementoImporter;
 
 /**
- * Provides methods for capturing game data state in a memento and restoring game data state from a memento.
+ * Provides factory methods for creating objects that can import mementos to and export mementos from game data.
  */
 public final class GameDataMemento {
   @VisibleForTesting
-  static final class AttributeNames {
-    private AttributeNames() {}
+  static final class PropertyNames {
+    private PropertyNames() {}
 
-    static final String META_MIME_TYPE = "_meta:mimeType";
-    static final String META_VERSION = "_meta:version";
     static final String NAME = "name";
     static final String VERSION = "version";
   }
@@ -29,141 +33,135 @@ public final class GameDataMemento {
   static final long CURRENT_VERSION = 1L;
 
   @VisibleForTesting
-  static final String MIME_TYPE = "x.triplea.game-data-memento";
+  static final String ID = "application/x.triplea.game-data-memento";
 
-  /** An immutable collection of default options for creating a new game data memento. */
-  public static final Map<OptionName, Object> DEFAULT_OPTIONS = newDefaultOptions();
+  /**
+   * An immutable collection of default memento export options.
+   *
+   * <p>
+   * The key is the option name. The value is the option value.
+   * </p>
+   */
+  public static final Map<ExportOptionName, Object> DEFAULT_EXPORT_OPTIONS_BY_NAME = newDefaultExportOptionsByName();
 
   private GameDataMemento() {}
 
-  private static Map<OptionName, Object> newDefaultOptions() {
-    final EnumMap<OptionName, Object> options = new EnumMap<>(OptionName.class);
-    options.put(OptionName.EXCLUDE_DELEGATES, false);
+  private static Map<ExportOptionName, Object> newDefaultExportOptionsByName() {
+    final EnumMap<ExportOptionName, Object> options = new EnumMap<>(ExportOptionName.class);
+    options.put(ExportOptionName.EXCLUDE_DELEGATES, false);
     return Collections.unmodifiableMap(options);
   }
 
   /**
-   * Creates a new memento for the specified game data using the default options.
+   * Creates a new game data memento exporter using the default export options.
    *
-   * @param gameData The memento originator; must not be {@code null}.
-   *
-   * @return A game data memento; never {@code null}.
+   * @return A new game data memento exporter; never {@code null}.
    */
-  public static Object fromGameData(final GameData gameData) {
-    checkNotNull(gameData);
-
-    return fromGameData(gameData, DEFAULT_OPTIONS);
+  public static MementoExporter<GameData> newExporter() {
+    return newExporter(DEFAULT_EXPORT_OPTIONS_BY_NAME);
   }
 
   /**
-   * Creates a new memento for the specified game data using the specified options.
+   * Creates a new game data memento exporter using the specified export options.
    *
-   * @param gameData The memento originator; must not be {@code null}.
-   * @param options The memento creation options; must not be {@code null}.
+   * @param optionsByName The memento export options; must not be {@code null}. The key is the option name. The value is
+   *        the option value.
    *
-   * @return A game data memento; never {@code null}.
-   *
-   * @throws IllegalArgumentException If {@code options} contains an illegal value (e.g. the value is of the wrong
-   *         type).
+   * @return A new game data memento exporter; never {@code null}.
    */
-  public static Object fromGameData(final GameData gameData, final Map<OptionName, Object> options) {
-    checkNotNull(gameData);
-    checkNotNull(options);
+  public static MementoExporter<GameData> newExporter(final Map<ExportOptionName, Object> optionsByName) {
+    checkNotNull(optionsByName);
 
-    // TODO: add support for options
-
-    final Map<String, Object> attributes = new HashMap<>();
-
-    gameData.acquireReadLock();
-    try {
-      attributes.put(AttributeNames.META_MIME_TYPE, MIME_TYPE);
-      attributes.put(AttributeNames.META_VERSION, CURRENT_VERSION);
-      attributes.put(AttributeNames.NAME, gameData.getGameName());
-      attributes.put(AttributeNames.VERSION, gameData.getGameVersion());
-      // TODO: add remaining attributes
-    } finally {
-      gameData.releaseReadLock();
-    }
-
-    return mementoFromAttributes(attributes);
-  }
-
-  private static Object mementoFromAttributes(final Map<String, Object> attributes) {
-    assert attributes != null;
-
-    return attributes;
+    return new PropertyBagMementoExporter<>(ID, CURRENT_VERSION, new ExportHandlers(optionsByName));
   }
 
   /**
-   * The names of the options that can be specified when creating a new game data memento.
+   * Names the options that can be specified when creating a new game data memento exporter.
    */
-  public static enum OptionName {
+  public static enum ExportOptionName {
     /**
      * Indicates delegates should be excluded from the memento (value type: {@code Boolean}).
      */
     EXCLUDE_DELEGATES
   }
 
+  private static final class ExportHandlers implements PropertyBagMementoExporter.HandlerSupplier<GameData> {
+    private final Map<Long, PropertyBagMementoExporter.Handler<GameData>> handlersByVersion = getHandlersByVersion();
+
+    // TODO: add support for options
+    @SuppressWarnings("unused")
+    private final Map<ExportOptionName, Object> optionsByName;
+
+    ExportHandlers(final Map<ExportOptionName, Object> optionsByName) {
+      this.optionsByName = new HashMap<>(optionsByName);
+    }
+
+    private Map<Long, PropertyBagMementoExporter.Handler<GameData>> getHandlersByVersion() {
+      final Map<Long, PropertyBagMementoExporter.Handler<GameData>> handlersByVersion = new HashMap<>();
+      handlersByVersion.put(1L, this::exportPropertiesV1);
+      return Collections.unmodifiableMap(handlersByVersion);
+    }
+
+    private void exportPropertiesV1(final GameData gameData, final Map<String, Object> propertiesByName) {
+      propertiesByName.put(PropertyNames.NAME, gameData.getGameName());
+      propertiesByName.put(PropertyNames.VERSION, gameData.getGameVersion());
+      // TODO: handle remaining properties
+    }
+
+    @Override
+    public Optional<PropertyBagMementoExporter.Handler<GameData>> getHandler(final long version) {
+      return Optional.ofNullable(handlersByVersion.get(version));
+    }
+  }
+
   /**
-   * Creates a new game data from the specified memento.
+   * Creates a new game data memento importer.
    *
-   * @param memento The game data memento; must not be {@code null}.
-   *
-   * @return A new game data; never {@code null}.
-   *
-   * @throws GameDataMementoException If the memento does not represent a valid game data state.
+   * @return A new game data memento importer; never {@code null}.
    */
-  public static GameData toGameData(final Object memento) throws GameDataMementoException {
-    checkNotNull(memento);
-
-    final Map<String, Object> attributes = mementoToAttributes(memento);
-    verifyMetadata(attributes);
-
-    final GameData gameData = new GameData();
-    gameData.setGameName(getRequiredAttribute(attributes, AttributeNames.NAME, String.class));
-    gameData.setGameVersion(getRequiredAttribute(attributes, AttributeNames.VERSION, Version.class));
-    // TODO: add remaining attributes
-    return gameData;
+  public static MementoImporter<GameData> newImporter() {
+    return new PropertyBagMementoImporter<>(ID, new ImportHandlers());
   }
 
-  private static Map<String, Object> mementoToAttributes(final Object memento) throws GameDataMementoException {
-    try {
-      @SuppressWarnings("unchecked")
-      final Map<String, Object> attributes = (Map<String, Object>) memento;
-      return attributes;
-    } catch (final ClassCastException e) {
-      throw new GameDataMementoException("memento has wrong type", e);
-    }
-  }
+  private static final class ImportHandlers implements PropertyBagMementoImporter.HandlerSupplier<GameData> {
+    private final Map<Long, PropertyBagMementoImporter.Handler<GameData>> handlersByVersion = getHandlersByVersion();
 
-  private static void verifyMetadata(final Map<String, Object> attributes) throws GameDataMementoException {
-    final String mimeType = getRequiredAttribute(attributes, AttributeNames.META_MIME_TYPE, String.class);
-    if (!MIME_TYPE.equals(mimeType)) {
-      throw new GameDataMementoException("memento specifies an illegal MIME type");
+    private Map<Long, PropertyBagMementoImporter.Handler<GameData>> getHandlersByVersion() {
+      final Map<Long, PropertyBagMementoImporter.Handler<GameData>> handlersByVersion = new HashMap<>();
+      handlersByVersion.put(1L, this::importPropertiesV1);
+      return Collections.unmodifiableMap(handlersByVersion);
     }
 
-    final long version = getRequiredAttribute(attributes, AttributeNames.META_VERSION, Long.class);
-    if (version != CURRENT_VERSION) {
-      throw new GameDataMementoException("memento specifies an incompatible version");
-    }
-  }
-
-  private static <T> T getRequiredAttribute(
-      final Map<String, Object> attributes,
-      final String name,
-      final Class<T> type) throws GameDataMementoException {
-    assert attributes != null;
-    assert name != null;
-    assert type != null;
-
-    if (!attributes.containsKey(name)) {
-      throw new GameDataMementoException(String.format("memento is missing required attribute '%s'", name));
+    private GameData importPropertiesV1(final Map<String, Object> propertiesByName) throws MementoImportException {
+      final GameData gameData = new GameData();
+      gameData.setGameName(getRequiredProperty(propertiesByName, PropertyNames.NAME, String.class));
+      gameData.setGameVersion(getRequiredProperty(propertiesByName, PropertyNames.VERSION, Version.class));
+      // TODO: handle remaining properties
+      return gameData;
     }
 
-    try {
-      return type.cast(attributes.get(name));
-    } catch (final ClassCastException e) {
-      throw new GameDataMementoException(String.format("memento attribute '%s' has wrong type", name), e);
+    private static <T> T getRequiredProperty(
+        final Map<String, Object> propertiesByName,
+        final String name,
+        final Class<T> type) throws MementoImportException {
+      assert propertiesByName != null;
+      assert name != null;
+      assert type != null;
+
+      if (!propertiesByName.containsKey(name)) {
+        throw new MementoImportException(String.format("memento is missing required property '%s'", name));
+      }
+
+      try {
+        return type.cast(propertiesByName.get(name));
+      } catch (final ClassCastException e) {
+        throw new MementoImportException(String.format("memento property '%s' has wrong type", name), e);
+      }
+    }
+
+    @Override
+    public Optional<PropertyBagMementoImporter.Handler<GameData>> getHandler(final long version) {
+      return Optional.ofNullable(handlersByVersion.get(version));
     }
   }
 }
