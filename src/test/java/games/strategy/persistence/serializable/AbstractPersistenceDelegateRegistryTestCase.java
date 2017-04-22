@@ -40,7 +40,7 @@ public abstract class AbstractPersistenceDelegateRegistryTestCase {
    *
    * @return The persistence delegate registry to be tested; never {@code null}.
    *
-   * @throws Exception If the persistence delegate cannot be created.
+   * @throws Exception If the persistence delegate registry cannot be created.
    */
   protected abstract PersistenceDelegateRegistry createPersistenceDelegateRegistry() throws Exception;
 

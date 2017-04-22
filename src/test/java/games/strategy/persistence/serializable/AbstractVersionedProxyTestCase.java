@@ -60,7 +60,7 @@ public abstract class AbstractVersionedProxyTestCase<T> {
   protected abstract List<SupportedVersion<T>> getSupportedVersions();
 
   @Test
-  public void proxy_ShouldBeAbleToReadAllSupportedVersions() throws Exception {
+  public void shouldBeAbleToReadAllSupportedVersions() throws Exception {
     for (final SupportedVersion<T> supportedVersion : getSupportedVersions()) {
       final Object untypedActual = deserializeFromBase16EncodedBytes(supportedVersion.base16EncodedBytes);
 
@@ -72,8 +72,8 @@ public abstract class AbstractVersionedProxyTestCase<T> {
   }
 
   /**
-   * Encapsulates information about a single serializable proxy version used by the test fixture to ensure the proxy
-   * supports reading it.
+   * Information about a single serializable proxy version used by the test fixture to ensure the proxy supports reading
+   * it.
    *
    * @param <T> The type of the subject to be persisted.
    */
