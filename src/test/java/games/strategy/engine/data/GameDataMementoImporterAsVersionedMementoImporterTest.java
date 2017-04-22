@@ -6,9 +6,9 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
 
 import games.strategy.util.memento.AbstractVersionedMementoImporterTestCase;
 import games.strategy.util.memento.Memento;
@@ -37,11 +37,11 @@ public final class GameDataMementoImporterAsVersionedMementoImporterTest
 
   private static SupportedVersion<GameData> v1() {
     final GameData expected = TestGameDataFactory.newValidGameData();
-    final Map<String, Object> propertiesByName = new HashMap<>();
-    propertiesByName.put("name", expected.getGameName());
-    propertiesByName.put("version", expected.getGameVersion());
-    // TODO: add remaining properties
-    final Memento memento = new PropertyBagMemento(GameDataMemento.ID, 1L, propertiesByName);
+    final Memento memento = new PropertyBagMemento(GameDataMemento.ID, 1L, ImmutableMap.<String, Object>builder()
+        .put("name", expected.getGameName())
+        .put("version", expected.getGameVersion())
+        // TODO: add remaining properties
+        .build());
     return new SupportedVersion<>(expected, memento);
   }
 }

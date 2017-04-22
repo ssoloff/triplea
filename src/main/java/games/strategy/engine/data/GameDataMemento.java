@@ -2,13 +2,13 @@ package games.strategy.engine.data;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Collections;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 
 import games.strategy.util.Version;
 import games.strategy.util.memento.MementoExporter;
@@ -47,9 +47,8 @@ public final class GameDataMemento {
   private GameDataMemento() {}
 
   private static Map<ExportOptionName, Object> newDefaultExportOptionsByName() {
-    final EnumMap<ExportOptionName, Object> options = new EnumMap<>(ExportOptionName.class);
-    options.put(ExportOptionName.EXCLUDE_DELEGATES, false);
-    return Collections.unmodifiableMap(options);
+    return Maps.immutableEnumMap(ImmutableMap.of(
+        ExportOptionName.EXCLUDE_DELEGATES, false));
   }
 
   /**
@@ -97,9 +96,9 @@ public final class GameDataMemento {
     }
 
     private Map<Long, PropertyBagMementoExporter.Handler<GameData>> getHandlersByVersion() {
-      final Map<Long, PropertyBagMementoExporter.Handler<GameData>> handlersByVersion = new HashMap<>();
-      handlersByVersion.put(1L, this::exportPropertiesV1);
-      return Collections.unmodifiableMap(handlersByVersion);
+      return ImmutableMap.<Long, PropertyBagMementoExporter.Handler<GameData>>builder()
+          .put(1L, this::exportPropertiesV1)
+          .build();
     }
 
     private void exportPropertiesV1(final GameData gameData, final Map<String, Object> propertiesByName) {
@@ -127,9 +126,9 @@ public final class GameDataMemento {
     private final Map<Long, PropertyBagMementoImporter.Handler<GameData>> handlersByVersion = getHandlersByVersion();
 
     private Map<Long, PropertyBagMementoImporter.Handler<GameData>> getHandlersByVersion() {
-      final Map<Long, PropertyBagMementoImporter.Handler<GameData>> handlersByVersion = new HashMap<>();
-      handlersByVersion.put(1L, this::importPropertiesV1);
-      return Collections.unmodifiableMap(handlersByVersion);
+      return ImmutableMap.<Long, PropertyBagMementoImporter.Handler<GameData>>builder()
+          .put(1L, this::importPropertiesV1)
+          .build();
     }
 
     private GameData importPropertiesV1(final Map<String, Object> propertiesByName) throws MementoImportException {

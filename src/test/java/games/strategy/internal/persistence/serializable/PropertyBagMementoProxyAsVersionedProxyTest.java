@@ -1,9 +1,9 @@
 package games.strategy.internal.persistence.serializable;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
 
 import games.strategy.persistence.serializable.AbstractVersionedProxyTestCase;
 import games.strategy.util.memento.PropertyBagMemento;
@@ -32,10 +32,9 @@ public final class PropertyBagMementoProxyAsVersionedProxyTest
         + "616C7565787200106A6176612E6C616E672E4E756D62657286AC951D0B94E08B" // aluexr..java.lang.Number........
         + "0200007870000000000000002A7878" //////////////////////////////////// ...xp.......*xx
         + "";
-    final Map<String, Object> propertiesByName = new HashMap<>();
-    propertiesByName.put("property1", 42L);
-    propertiesByName.put("property2", "2112");
-    final PropertyBagMemento expected = new PropertyBagMemento("id", 8L, propertiesByName);
+    final PropertyBagMemento expected = new PropertyBagMemento("id", 8L, ImmutableMap.<String, Object>of(
+        "property1", 42L,
+        "property2", "2112"));
     return new SupportedVersion<>(expected, base16EncodedBytes);
   }
 }

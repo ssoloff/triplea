@@ -5,10 +5,10 @@ import static org.junit.Assert.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.Test;
+
+import com.google.common.collect.ImmutableMap;
 
 import games.strategy.internal.persistence.serializable.PropertyBagMementoPersistenceDelegate;
 import games.strategy.persistence.serializable.DefaultPersistenceDelegateRegistry;
@@ -41,10 +41,9 @@ public final class SerializableMementoImportExportIntegrationTest {
   }
 
   private static Memento newMemento() {
-    final Map<String, Object> propertiesByName = new HashMap<>();
-    propertiesByName.put("property1", 42);
-    propertiesByName.put("property2", "2112");
-    return new PropertyBagMemento("id", 1L, propertiesByName);
+    return new PropertyBagMemento("id", 1L, ImmutableMap.<String, Object>of(
+        "property1", 42,
+        "property2", "2112"));
   }
 
   private byte[] exportMemento(final Memento memento) throws Exception {

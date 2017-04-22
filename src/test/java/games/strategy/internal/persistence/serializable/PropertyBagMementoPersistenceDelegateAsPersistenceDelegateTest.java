@@ -1,7 +1,6 @@
 package games.strategy.internal.persistence.serializable;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.google.common.collect.ImmutableMap;
 
 import games.strategy.persistence.serializable.AbstractPersistenceDelegateTestCase;
 import games.strategy.persistence.serializable.PersistenceDelegateRegistry;
@@ -15,10 +14,9 @@ public final class PropertyBagMementoPersistenceDelegateAsPersistenceDelegateTes
 
   @Override
   protected PropertyBagMemento createSubject() {
-    final Map<String, Object> propertiesByName = new HashMap<>();
-    propertiesByName.put("property1", 42L);
-    propertiesByName.put("property2", "2112");
-    return new PropertyBagMemento("id", 8L, propertiesByName);
+    return new PropertyBagMemento("id", 8L, ImmutableMap.<String, Object>of(
+        "property1", 42L,
+        "property2", "2112"));
   }
 
   @Override

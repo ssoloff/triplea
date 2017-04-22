@@ -2,8 +2,10 @@ package games.strategy.engine.data;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.HashMap;
 import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 
 import games.strategy.util.memento.Memento;
 import games.strategy.util.memento.PropertyBagMemento;
@@ -25,11 +27,11 @@ public final class TestGameDataMementoFactory {
 
   private static Map<String, Object> newValidMementoPropertiesByName() {
     final GameData gameData = TestGameDataFactory.newValidGameData();
-    final Map<String, Object> propertiesByName = new HashMap<>();
-    propertiesByName.put(GameDataMemento.PropertyNames.NAME, gameData.getGameName());
-    propertiesByName.put(GameDataMemento.PropertyNames.VERSION, gameData.getGameVersion());
-    // TODO: handle other properties
-    return propertiesByName;
+    return Maps.newHashMap(ImmutableMap.<String, Object>builder()
+        .put(GameDataMemento.PropertyNames.NAME, gameData.getGameName())
+        .put(GameDataMemento.PropertyNames.VERSION, gameData.getGameVersion())
+        // TODO: handle other properties
+        .build());
   }
 
   private static PropertyBagMemento newMementoWithProperties(final Map<String, Object> propertiesByName) {

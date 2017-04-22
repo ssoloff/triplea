@@ -9,11 +9,11 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 import org.junit.Test;
+
+import com.google.common.collect.ImmutableMap;
 
 import games.strategy.util.memento.PropertyBagMementoExporter.HandlerSupplier;
 
@@ -67,10 +67,9 @@ public final class PropertyBagMementoExporterTest {
   }
 
   private PropertyBagMemento newMemento() {
-    final Map<String, Object> propertiesByName = new HashMap<>();
-    propertiesByName.put("field1", originator.field1);
-    propertiesByName.put("field2", originator.field2);
-    return new PropertyBagMemento(ID, DEFAULT_VERSION, propertiesByName);
+    return new PropertyBagMemento(ID, DEFAULT_VERSION, ImmutableMap.<String, Object>of(
+        "field1", originator.field1,
+        "field2", originator.field2));
   }
 
   @Test
