@@ -8,27 +8,16 @@ import java.io.ByteArrayOutputStream;
 
 import org.junit.Test;
 
-import com.google.common.collect.ImmutableMap;
-
-import games.strategy.internal.persistence.serializable.PropertyBagMementoPersistenceDelegate;
 import games.strategy.persistence.serializable.DefaultPersistenceDelegateRegistry;
 import games.strategy.persistence.serializable.PersistenceDelegateRegistry;
 import games.strategy.util.memento.Memento;
-import games.strategy.util.memento.PropertyBagMemento;
 
 /**
  * A fixture for testing the integration between the {@link SerializableMementoImporter} and
  * {@link SerializableMementoExporter} classes.
  */
 public final class SerializableMementoImportExportIntegrationTest {
-  private final PersistenceDelegateRegistry persistenceDelegateRegistry = newPersistenceDelegateRegistry();
-
-  private static PersistenceDelegateRegistry newPersistenceDelegateRegistry() {
-    final PersistenceDelegateRegistry persistenceDelegateRegistry = new DefaultPersistenceDelegateRegistry();
-    persistenceDelegateRegistry.registerPersistenceDelegate(
-        PropertyBagMemento.class, new PropertyBagMementoPersistenceDelegate());
-    return persistenceDelegateRegistry;
-  }
+  private final PersistenceDelegateRegistry persistenceDelegateRegistry = new DefaultPersistenceDelegateRegistry();
 
   @Test
   public void shouldBeAbleToRoundTripMemento() throws Exception {
@@ -41,9 +30,7 @@ public final class SerializableMementoImportExportIntegrationTest {
   }
 
   private static Memento newMemento() {
-    return new PropertyBagMemento("schema-id", 1L, ImmutableMap.<String, Object>of(
-        "property1", 42,
-        "property2", "2112"));
+    return new FakeMemento("field");
   }
 
   private byte[] exportMemento(final Memento memento) throws Exception {

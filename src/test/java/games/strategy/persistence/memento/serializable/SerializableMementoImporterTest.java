@@ -15,36 +15,26 @@ import static org.mockito.Mockito.verify;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.Collections;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import games.strategy.internal.persistence.serializable.PropertyBagMementoPersistenceDelegate;
 import games.strategy.persistence.serializable.DefaultPersistenceDelegateRegistry;
 import games.strategy.persistence.serializable.ObjectOutputStream;
 import games.strategy.persistence.serializable.PersistenceDelegateRegistry;
 import games.strategy.util.memento.Memento;
-import games.strategy.util.memento.PropertyBagMemento;
 
 @RunWith(MockitoJUnitRunner.class)
 public final class SerializableMementoImporterTest {
-  private final PersistenceDelegateRegistry persistenceDelegateRegistry = newPersistenceDelegateRegistry();
+  private final PersistenceDelegateRegistry persistenceDelegateRegistry = new DefaultPersistenceDelegateRegistry();
 
   private final Memento memento = newMemento();
 
   private final SerializableMementoImporter mementoImporter = newMementoImporter();
 
-  private static PersistenceDelegateRegistry newPersistenceDelegateRegistry() {
-    final PersistenceDelegateRegistry persistenceDelegateRegistry = new DefaultPersistenceDelegateRegistry();
-    persistenceDelegateRegistry.registerPersistenceDelegate(
-        PropertyBagMemento.class, new PropertyBagMementoPersistenceDelegate());
-    return persistenceDelegateRegistry;
-  }
-
   private static Memento newMemento() {
-    return new PropertyBagMemento("schema-id", 1L, Collections.emptyMap());
+    return new FakeMemento("field");
   }
 
   private SerializableMementoImporter newMementoImporter() {
