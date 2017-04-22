@@ -1,8 +1,5 @@
 package games.strategy.persistence.serializable;
 
-import static com.googlecode.catchexception.CatchException.catchException;
-import static com.googlecode.catchexception.CatchException.caughtException;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
@@ -39,20 +36,6 @@ public final class ObjectOutputStreamTest {
   @After
   public void tearDown() throws Exception {
     oos.close();
-  }
-
-  @Test
-  public void constructor_ShouldThrowExceptionWhenOutputStreamIsNull() {
-    catchException(() -> new ObjectOutputStream(null, persistenceDelegateRegistry));
-
-    assertThat(caughtException(), is(instanceOf(NullPointerException.class)));
-  }
-
-  @Test
-  public void constructor_ShouldThrowExceptionWhenPersistenceDelegateRegistryIsNull() {
-    catchException(() -> new ObjectOutputStream(newEmptyOutputStream(), null));
-
-    assertThat(caughtException(), is(instanceOf(NullPointerException.class)));
   }
 
   @Test

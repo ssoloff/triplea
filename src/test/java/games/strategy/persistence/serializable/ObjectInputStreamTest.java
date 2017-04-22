@@ -1,8 +1,5 @@
 package games.strategy.persistence.serializable;
 
-import static com.googlecode.catchexception.CatchException.catchException;
-import static com.googlecode.catchexception.CatchException.caughtException;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
@@ -49,20 +46,6 @@ public final class ObjectInputStreamTest {
   }
 
   @Test
-  public void constructor_ShouldThrowExceptionWhenInputStreamIsNull() {
-    catchException(() -> new ObjectInputStream(null, persistenceDelegateRegistry));
-
-    assertThat(caughtException(), is(instanceOf(NullPointerException.class)));
-  }
-
-  @Test
-  public void constructor_ShouldThrowExceptionWhenPersistenceDelegateRegistryIsNull() {
-    catchException(() -> new ObjectInputStream(newNonEmptyInputStream(), null));
-
-    assertThat(caughtException(), is(instanceOf(NullPointerException.class)));
-  }
-
-  @Test
   public void resolveClass_ShouldDelegateToPersistenceDelegateWhenPersistenceDelegateAvailable() throws Exception {
     final ObjectStreamClass desc = ObjectStreamClass.lookup(Integer.class);
     persistenceDelegateRegistry.registerPersistenceDelegate(desc.forClass(), persistenceDelegate);
@@ -75,13 +58,6 @@ public final class ObjectInputStreamTest {
   @Test
   public void resolveClass_ShouldNotThrowExceptionWhenPersistenceDelegateUnavailable() throws Exception {
     ois.resolveClass(ObjectStreamClass.lookup(Integer.class));
-  }
-
-  @Test
-  public void resolveClass_ShouldThrowExceptionWhenDescriptorIsNull() throws Exception {
-    catchException(() -> ois.resolveClass(null));
-
-    assertThat(caughtException(), is(instanceOf(NullPointerException.class)));
   }
 
   @Test

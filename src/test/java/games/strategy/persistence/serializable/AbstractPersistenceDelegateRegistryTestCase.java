@@ -82,13 +82,6 @@ public abstract class AbstractPersistenceDelegateRegistryTestCase {
   }
 
   @Test
-  public void getPersistenceDelegateForType_ShouldThrowExceptionWhenTypeIsNull() {
-    catchException(() -> persistenceDelegateRegistry.getPersistenceDelegate((Class<?>) null));
-
-    assertThat(caughtException(), is(instanceOf(NullPointerException.class)));
-  }
-
-  @Test
   public void getPersistenceDelegateForTypeName_ShouldReturnPersistenceDelegateWhenTypeNamePresent() {
     persistenceDelegateRegistry.registerPersistenceDelegate(type, persistenceDelegate);
 
@@ -99,13 +92,6 @@ public abstract class AbstractPersistenceDelegateRegistryTestCase {
   @Test
   public void getPersistenceDelegateForTypeName_ShouldReturnEmptyWhenTypeNameAbsent() {
     assertThat(persistenceDelegateRegistry.getPersistenceDelegate("unknownTypeName"), is(Optional.empty()));
-  }
-
-  @Test
-  public void getPersistenceDelegateForTypeName_ShouldThrowExceptionWhenTypeNameIsNull() {
-    catchException(() -> persistenceDelegateRegistry.getPersistenceDelegate((String) null));
-
-    assertThat(caughtException(), is(instanceOf(NullPointerException.class)));
   }
 
   @Test
@@ -134,20 +120,6 @@ public abstract class AbstractPersistenceDelegateRegistryTestCase {
   }
 
   @Test
-  public void registerPersistenceDelegate_ShouldThrowExceptionWhenTypeIsNull() {
-    catchException(() -> persistenceDelegateRegistry.registerPersistenceDelegate(null, persistenceDelegate));
-
-    assertThat(caughtException(), is(instanceOf(NullPointerException.class)));
-  }
-
-  @Test
-  public void registerPersistenceDelegate_ShouldThrowExceptionWhenPersistenceDelegateIsNull() {
-    catchException(() -> persistenceDelegateRegistry.registerPersistenceDelegate(type, null));
-
-    assertThat(caughtException(), is(instanceOf(NullPointerException.class)));
-  }
-
-  @Test
   public void registerPersistenceDelegate_ShouldThrowExceptionWhenTypeRegistered() {
     persistenceDelegateRegistry.registerPersistenceDelegate(type, persistenceDelegate);
 
@@ -167,20 +139,6 @@ public abstract class AbstractPersistenceDelegateRegistryTestCase {
 
     assertThat(persistenceDelegateRegistry.getPersistenceDelegate(type), is(Optional.empty()));
     assertThat(persistenceDelegateRegistry.getTypeNames(), hasSize(originalTypeNamesSize));
-  }
-
-  @Test
-  public void unregisterPersistenceDelegate_ShouldThrowExceptionWhenTypeIsNull() {
-    catchException(() -> persistenceDelegateRegistry.unregisterPersistenceDelegate(null, persistenceDelegate));
-
-    assertThat(caughtException(), is(instanceOf(NullPointerException.class)));
-  }
-
-  @Test
-  public void unregisterPersistenceDelegate_ShouldThrowExceptionWhenPersistenceDelegateIsNull() {
-    catchException(() -> persistenceDelegateRegistry.unregisterPersistenceDelegate(type, null));
-
-    assertThat(caughtException(), is(instanceOf(NullPointerException.class)));
   }
 
   @Test

@@ -31,13 +31,6 @@ public final class VersionedProxySupportTest {
   private ObjectOutput out;
 
   @Test
-  public void constructor_ShouldThrowExceptionWhenProxyIsNull() {
-    catchException(() -> new VersionedProxySupport(null));
-
-    assertThat(caughtException(), is(instanceOf(NullPointerException.class)));
-  }
-
-  @Test
   public void read_ShouldCallCorrectProxyHandlerWhenVersionSupported() throws Exception {
     final AtomicBoolean wasV1Read = new AtomicBoolean(false);
     final FakeVersionedProxy proxy = newVersionedProxyWithV1Reader(in -> {
@@ -152,15 +145,6 @@ public final class VersionedProxySupportTest {
   }
 
   @Test
-  public void read_ShouldThrowExceptionWhenStreamIsNull() {
-    final FakeVersionedProxy proxy = newVersionedProxyWithV1Reader();
-
-    catchException(() -> proxy.getVersionedProxySupport().read(null));
-
-    assertThat(caughtException(), is(instanceOf(NullPointerException.class)));
-  }
-
-  @Test
   public void write_ShouldCallCorrectProxyHandlerWhenVersionSupported() throws Exception {
     final AtomicBoolean wasV1Written = new AtomicBoolean(false);
     final FakeVersionedProxy proxy = newVersionedProxyWithV1Writer(out -> {
@@ -253,15 +237,6 @@ public final class VersionedProxySupportTest {
     catchException(() -> proxy.getVersionedProxySupport().write(out, 1));
 
     assertThat(caughtException(), allOf(is(instanceOf(RuntimeException.class)), hasMessage("42")));
-  }
-
-  @Test
-  public void write_ShouldThrowExceptionWhenStreamIsNull() {
-    final FakeVersionedProxy proxy = newVersionedProxyWithV1Writer();
-
-    catchException(() -> proxy.getVersionedProxySupport().write(null, 1));
-
-    assertThat(caughtException(), is(instanceOf(NullPointerException.class)));
   }
 
   @Test
