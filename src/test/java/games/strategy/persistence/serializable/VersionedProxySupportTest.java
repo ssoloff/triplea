@@ -58,6 +58,8 @@ public final class VersionedProxySupportTest {
 
   private static FakeVersionedProxy newVersionedProxyWithV1Reader(final Reader reader) {
     return new FakeVersionedProxy() {
+      private static final long serialVersionUID = 7551665971441431048L;
+
       @SuppressWarnings("unused")
       private void readExternalV1(final ObjectInput in) throws IOException, ClassNotFoundException {
         reader.read(in);
@@ -178,6 +180,8 @@ public final class VersionedProxySupportTest {
 
   private static FakeVersionedProxy newVersionedProxyWithV1Writer(final Writer writer) {
     return new FakeVersionedProxy() {
+      private static final long serialVersionUID = 5191953634904657494L;
+
       @SuppressWarnings("unused")
       private void writeExternalV1(final ObjectOutput out) throws IOException {
         writer.write(out);
@@ -289,6 +293,8 @@ public final class VersionedProxySupportTest {
   }
 
   private static class FakeVersionedProxy implements Externalizable {
+    private static final long serialVersionUID = 4915747298980371948L;
+
     private final VersionedProxySupport versionedProxySupport = new VersionedProxySupport(this);
 
     final VersionedProxySupport getVersionedProxySupport() {
@@ -307,6 +313,8 @@ public final class VersionedProxySupportTest {
   }
 
   private static final class FakeVersionedProxyWithNonPrivateV1Handlers extends FakeVersionedProxy {
+    private static final long serialVersionUID = 3580688683441635324L;
+
     @SuppressWarnings("unused")
     public void readExternalV1(final ObjectInput in) {
       // do nothing
@@ -319,6 +327,8 @@ public final class VersionedProxySupportTest {
   }
 
   private static final class FakeVersionedProxyWithStaticV1Handlers extends FakeVersionedProxy {
+    private static final long serialVersionUID = 1432485788155460084L;
+
     @SuppressWarnings("unused")
     private static void readExternalV1(final ObjectInput in) {
       // do nothing
@@ -331,6 +341,8 @@ public final class VersionedProxySupportTest {
   }
 
   private static final class FakeVersionedProxyWithNonVoidReturnTypeV1Handlers extends FakeVersionedProxy {
+    private static final long serialVersionUID = -5845503130403910828L;
+
     @SuppressWarnings("unused")
     private Object readExternalV1(final ObjectInput in) {
       return this;
