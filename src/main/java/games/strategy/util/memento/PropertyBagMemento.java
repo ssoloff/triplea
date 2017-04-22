@@ -14,36 +14,30 @@ import java.util.Objects;
  * </p>
  */
 public final class PropertyBagMemento implements Memento {
-  private final String id;
-
   private final Map<String, Object> propertiesByName;
 
-  private final long version;
+  private final String schemaId;
+
+  private final long schemaVersion;
 
   /**
    * Initializes a new instance of the {@code PropertyBagMemento} class.
    *
-   * @param id The memento identifier; must not be {@code null}.
-   * @param version The memento version.
+   * @param schemaId The memento schema identifier; must not be {@code null}.
+   * @param schemaVersion The memento schema version.
    * @param propertiesByName The collection of originator properties; must not be {@code null}. The key is the property
    *        name. The value is the property value.
    */
-  public PropertyBagMemento(final String id, final long version, final Map<String, Object> propertiesByName) {
-    checkNotNull(id);
+  public PropertyBagMemento(
+      final String schemaId,
+      final long schemaVersion,
+      final Map<String, Object> propertiesByName) {
+    checkNotNull(schemaId);
     checkNotNull(propertiesByName);
 
-    this.id = id;
     this.propertiesByName = new HashMap<>(propertiesByName);
-    this.version = version;
-  }
-
-  /**
-   * Gets the memento identifier.
-   *
-   * @return The memento identifier; never {@code null}.
-   */
-  public String getId() {
-    return id;
+    this.schemaId = schemaId;
+    this.schemaVersion = schemaVersion;
   }
 
   /**
@@ -57,12 +51,21 @@ public final class PropertyBagMemento implements Memento {
   }
 
   /**
-   * Gets the memento version.
+   * Gets the memento schema identifier.
    *
-   * @return The memento version.
+   * @return The memento schema identifier; never {@code null}.
    */
-  public long getVersion() {
-    return version;
+  public String getSchemaId() {
+    return schemaId;
+  }
+
+  /**
+   * Gets the memento schema version.
+   *
+   * @return The memento schema version.
+   */
+  public long getSchemaVersion() {
+    return schemaVersion;
   }
 
   @Override
@@ -74,26 +77,26 @@ public final class PropertyBagMemento implements Memento {
     }
 
     final PropertyBagMemento other = (PropertyBagMemento) obj;
-    return id.equals(other.id)
-        && (version == other.version)
+    return schemaId.equals(other.schemaId)
+        && (schemaVersion == other.schemaVersion)
         && propertiesByName.equals(other.propertiesByName);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, version, propertiesByName);
+    return Objects.hash(schemaId, schemaVersion, propertiesByName);
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     sb.append("PropertyBagMemento[");
-    sb.append("id=");
-    sb.append(id);
-    sb.append(", propertiesByName=");
+    sb.append("propertiesByName=");
     sb.append(propertiesByName);
-    sb.append(", version=");
-    sb.append(version);
+    sb.append(", schemaId=");
+    sb.append(schemaId);
+    sb.append(", schemaVersion=");
+    sb.append(schemaVersion);
     sb.append("]");
     return sb.toString();
   }

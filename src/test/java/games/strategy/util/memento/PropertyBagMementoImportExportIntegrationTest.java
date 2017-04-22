@@ -8,9 +8,9 @@ import java.util.Optional;
 import org.junit.Test;
 
 public final class PropertyBagMementoImportExportIntegrationTest {
-  private static final long DEFAULT_VERSION = 1L;
+  private static final long DEFAULT_SCHEMA_VERSION = 1L;
 
-  private static final String ID = "id";
+  private static final String SCHEMA_ID = "schema-id";
 
   private final FakeOriginator originator = new FakeOriginator(42, "2112");
 
@@ -23,28 +23,21 @@ public final class PropertyBagMementoImportExportIntegrationTest {
   }
 
   private static PropertyBagMementoExporter<FakeOriginator> newMementoExporter() {
-    return new PropertyBagMementoExporter<>(
-        ID,
-        DEFAULT_VERSION,
-        version -> {
-          return Optional.of(
-              (originator, propertiesByName) -> {
-                propertiesByName.put("field1", originator.field1);
-                propertiesByName.put("field2", originator.field2);
-              });
-        });
+    return new PropertyBagMementoExporter<>(SCHEMA_ID, DEFAULT_SCHEMA_VERSION, schemaVersion -> {
+      return Optional.of((originator, propertiesByName) -> {
+        propertiesByName.put("field1", originator.field1);
+        propertiesByName.put("field2", originator.field2);
+      });
+    });
   }
 
   private static PropertyBagMementoImporter<FakeOriginator> newMementoImporter() {
-    return new PropertyBagMementoImporter<>(
-        ID,
-        version -> {
-          return Optional.of(
-              propertiesByName -> {
-                final int field1 = (Integer) propertiesByName.get("field1");
-                final String field2 = (String) propertiesByName.get("field2");
-                return new FakeOriginator(field1, field2);
-              });
-        });
+    return new PropertyBagMementoImporter<>(SCHEMA_ID, schemaVersion -> {
+      return Optional.of(propertiesByName -> {
+        final int field1 = (Integer) propertiesByName.get("field1");
+        final String field2 = (String) propertiesByName.get("field2");
+        return new FakeOriginator(field1, field2);
+      });
+    });
   }
 }

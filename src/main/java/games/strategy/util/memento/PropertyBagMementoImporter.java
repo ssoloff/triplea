@@ -13,20 +13,20 @@ import java.util.Optional;
 public final class PropertyBagMementoImporter<T> implements MementoImporter<T> {
   private final HandlerSupplier<T> handlerSupplier;
 
-  private final String id;
+  private final String schemaId;
 
   /**
    * Initializes a new instance of the {@code PropertyBagMementoImporter} class.
    *
-   * @param id The identifier of the memento to import; must not be {@code null}.
+   * @param schemaId The schema identifier of the memento to import; must not be {@code null}.
    * @param handlerSupplier A supplier of import handlers for each supported version; must not be {@code null}.
    */
-  public PropertyBagMementoImporter(final String id, final HandlerSupplier<T> handlerSupplier) {
-    checkNotNull(id);
+  public PropertyBagMementoImporter(final String schemaId, final HandlerSupplier<T> handlerSupplier) {
+    checkNotNull(schemaId);
     checkNotNull(handlerSupplier);
 
     this.handlerSupplier = handlerSupplier;
-    this.id = id;
+    this.schemaId = schemaId;
   }
 
   @Override
@@ -52,12 +52,12 @@ public final class PropertyBagMementoImporter<T> implements MementoImporter<T> {
   public T importMemento(final PropertyBagMemento memento) throws MementoImportException {
     checkNotNull(memento);
 
-    if (!id.equals(memento.getId())) {
-      throw newUnsupportedIdException(memento.getId());
+    if (!schemaId.equals(memento.getSchemaId())) {
+      throw newUnsupportedSchemaIdException(memento.getSchemaId());
     }
 
-    final Handler<T> handler = handlerSupplier.getHandler(memento.getVersion())
-        .orElseThrow(() -> newUnsupportedVersionException(memento.getVersion()));
+    final Handler<T> handler = handlerSupplier.getHandler(memento.getSchemaVersion())
+        .orElseThrow(() -> newUnsupportedSchemaVersionException(memento.getSchemaVersion()));
     return handler.importProperties(memento.getPropertiesByName());
   }
 
@@ -66,12 +66,12 @@ public final class PropertyBagMementoImporter<T> implements MementoImporter<T> {
         PropertyBagMemento.class.getName(), memento.getClass().getName()));
   }
 
-  private static MementoImportException newUnsupportedIdException(final String id) {
-    return new MementoImportException(String.format("ID '%s' is unsupported", id));
+  private static MementoImportException newUnsupportedSchemaIdException(final String schemaId) {
+    return new MementoImportException(String.format("schema ID '%s' is unsupported", schemaId));
   }
 
-  private static MementoImportException newUnsupportedVersionException(final long version) {
-    return new MementoImportException(String.format("version %d is unsupported", version));
+  private static MementoImportException newUnsupportedSchemaVersionException(final long schemaVersion) {
+    return new MementoImportException(String.format("schema version %d is unsupported", schemaVersion));
   }
 
   /**
@@ -95,20 +95,20 @@ public final class PropertyBagMementoImporter<T> implements MementoImporter<T> {
   }
 
   /**
-   * Supplies memento import handlers for each supported version.
+   * Supplies memento import handlers for each supported schema version.
    *
    * @param <T> The type of the memento originator.
    */
   @FunctionalInterface
   public interface HandlerSupplier<T> {
     /**
-     * Gets the memento import handler for the specified version.
+     * Gets the memento import handler for the specified schema version.
      *
-     * @param version The memento version to import.
+     * @param schemaVersion The memento schema version to import.
      *
-     * @return The memento import handler for the specified version or empty if no handler is available; never
+     * @return The memento import handler for the specified schema version or empty if no handler is available; never
      *         {@code null}.
      */
-    Optional<Handler<T>> getHandler(long version);
+    Optional<Handler<T>> getHandler(long schemaVersion);
   }
 }

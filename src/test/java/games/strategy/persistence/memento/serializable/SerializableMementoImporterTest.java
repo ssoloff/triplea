@@ -44,7 +44,7 @@ public final class SerializableMementoImporterTest {
   }
 
   private static Memento newMemento() {
-    return new PropertyBagMemento("id", 1L, Collections.emptyMap());
+    return new PropertyBagMemento("schema-id", 1L, Collections.emptyMap());
   }
 
   private SerializableMementoImporter newMementoImporter() {

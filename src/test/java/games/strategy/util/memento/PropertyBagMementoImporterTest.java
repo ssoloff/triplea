@@ -19,16 +19,16 @@ import com.google.common.collect.ImmutableMap;
 import games.strategy.util.memento.PropertyBagMementoImporter.HandlerSupplier;
 
 public final class PropertyBagMementoImporterTest {
-  private static final String ID = "id";
+  private static final String SCHEMA_ID = "schema-id";
 
-  private static final long VERSION = 1L;
+  private static final long SCHEMA_VERSION = 1L;
 
   private final FakeOriginator originator = new FakeOriginator(42, "2112");
 
   @Test
   public void importMemento_ShouldThrowExceptionIfMementoHasWrongType() {
     final Memento memento = mock(Memento.class);
-    final PropertyBagMementoImporter<?> mementoImporter = newMementoImporterForAllVersions();
+    final PropertyBagMementoImporter<?> mementoImporter = newMementoImporterForAllSchemaVersions();
 
     catchException(() -> mementoImporter.importMemento(memento));
 
@@ -37,8 +37,8 @@ public final class PropertyBagMementoImporterTest {
         hasMessageThat(containsString("wrong type"))));
   }
 
-  private static PropertyBagMementoImporter<FakeOriginator> newMementoImporterForAllVersions() {
-    return newMementoImporter(version -> Optional.of(propertiesByName -> {
+  private static PropertyBagMementoImporter<FakeOriginator> newMementoImporterForAllSchemaVersions() {
+    return newMementoImporter(schemaVersion -> Optional.of(propertiesByName -> {
       return new FakeOriginator(
           (Integer) propertiesByName.get("field1"),
           (String) propertiesByName.get("field2"));
@@ -47,52 +47,52 @@ public final class PropertyBagMementoImporterTest {
 
   private static PropertyBagMementoImporter<FakeOriginator> newMementoImporter(
       final HandlerSupplier<FakeOriginator> handlerSupplier) {
-    return new PropertyBagMementoImporter<>(ID, handlerSupplier);
+    return new PropertyBagMementoImporter<>(SCHEMA_ID, handlerSupplier);
   }
 
   @Test
   public void importMementoWithPropertyBagMemento_ShouldReturnOriginatorWithMementoProperties() throws Exception {
-    final PropertyBagMemento memento = newMemento(ID, VERSION);
-    final PropertyBagMementoImporter<FakeOriginator> mementoImporter = newMementoImporterForAllVersions();
+    final PropertyBagMemento memento = newMemento(SCHEMA_ID, SCHEMA_VERSION);
+    final PropertyBagMementoImporter<FakeOriginator> mementoImporter = newMementoImporterForAllSchemaVersions();
 
     final FakeOriginator actual = mementoImporter.importMemento(memento);
 
     assertThat(actual, is(originator));
   }
 
-  private PropertyBagMemento newMemento(final String id, final long version) {
-    return new PropertyBagMemento(id, version, ImmutableMap.<String, Object>of(
+  private PropertyBagMemento newMemento(final String schemaId, final long schemaVersion) {
+    return new PropertyBagMemento(schemaId, schemaVersion, ImmutableMap.<String, Object>of(
         "field1", originator.field1,
         "field2", originator.field2));
   }
 
   @Test
-  public void importMementoWithPropertyBagMemento_ShouldThrowExceptionIfIdIsUnsupported() {
-    final String id = "other-id";
-    final PropertyBagMemento memento = newMemento(id, VERSION);
-    final PropertyBagMementoImporter<?> mementoImporter = newMementoImporterForAllVersions();
+  public void importMementoWithPropertyBagMemento_ShouldThrowExceptionIfSchemaIdIsUnsupported() {
+    final String schemaId = "other-schema-id";
+    final PropertyBagMemento memento = newMemento(schemaId, SCHEMA_VERSION);
+    final PropertyBagMementoImporter<?> mementoImporter = newMementoImporterForAllSchemaVersions();
 
     catchException(() -> mementoImporter.importMemento(memento));
 
     assertThat(caughtException(), allOf(
         is(instanceOf(MementoImportException.class)),
-        hasMessageThat(containsString(String.format("ID '%s' is unsupported", id)))));
+        hasMessageThat(containsString(String.format("schema ID '%s' is unsupported", schemaId)))));
   }
 
   @Test
-  public void importMementoWithPropertyBagMemento_ShouldThrowExceptionIfVersionIsUnsupported() {
-    final long version = 2112L;
-    final PropertyBagMemento memento = newMemento(ID, version);
-    final PropertyBagMementoImporter<?> mementoImporter = newMementoImporterForNoVersions();
+  public void importMementoWithPropertyBagMemento_ShouldThrowExceptionIfSchemaVersionIsUnsupported() {
+    final long schemaVersion = 2112L;
+    final PropertyBagMemento memento = newMemento(SCHEMA_ID, schemaVersion);
+    final PropertyBagMementoImporter<?> mementoImporter = newMementoImporterForNoSchemaVersions();
 
     catchException(() -> mementoImporter.importMemento(memento));
 
     assertThat(caughtException(), allOf(
         is(instanceOf(MementoImportException.class)),
-        hasMessageThat(containsString(String.format("version %d is unsupported", version)))));
+        hasMessageThat(containsString(String.format("schema version %d is unsupported", schemaVersion)))));
   }
 
-  private static PropertyBagMementoImporter<FakeOriginator> newMementoImporterForNoVersions() {
-    return newMementoImporter(version -> Optional.empty());
+  private static PropertyBagMementoImporter<FakeOriginator> newMementoImporterForNoSchemaVersions() {
+    return newMementoImporter(schemaVersion -> Optional.empty());
   }
 }

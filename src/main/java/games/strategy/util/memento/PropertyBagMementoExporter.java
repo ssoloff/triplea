@@ -12,58 +12,59 @@ import java.util.Optional;
  * @param <T> The type of the memento originator.
  */
 public final class PropertyBagMementoExporter<T> implements MementoExporter<T> {
-  private final long defaultVersion;
+  private final long defaultSchemaVersion;
 
   private final HandlerSupplier<T> handlerSupplier;
 
-  private final String id;
+  private final String schemaId;
 
   /**
    * Initializes a new instance of the {@code PropertyBagMementoExporter} class.
    *
-   * @param id The identifier of the memento to export; must not be {@code null}.
-   * @param defaultVersion The default version of the memento to export when the version is not explicitly specified.
-   * @param handlerSupplier A supplier of export handlers for each supported version; must not be {@code null}.
+   * @param schemaId The schema identifier of the memento to export; must not be {@code null}.
+   * @param defaultSchemaVersion The default schema version of the memento to export when the schema version is not
+   *        explicitly specified.
+   * @param handlerSupplier A supplier of export handlers for each supported schema version; must not be {@code null}.
    */
   public PropertyBagMementoExporter(
-      final String id,
-      final long defaultVersion,
+      final String schemaId,
+      final long defaultSchemaVersion,
       final HandlerSupplier<T> handlerSupplier) {
-    checkNotNull(id);
+    checkNotNull(schemaId);
     checkNotNull(handlerSupplier);
 
-    this.defaultVersion = defaultVersion;
+    this.defaultSchemaVersion = defaultSchemaVersion;
     this.handlerSupplier = handlerSupplier;
-    this.id = id;
+    this.schemaId = schemaId;
   }
 
   @Override
   public PropertyBagMemento exportMemento(final T originator) throws MementoExportException {
-    return exportMemento(originator, defaultVersion);
+    return exportMemento(originator, defaultSchemaVersion);
   }
 
   /**
-   * Exports a memento from the specified originator using the specified version of the memento.
+   * Exports a memento from the specified originator using the specified schema version of the memento.
    *
    * @param originator The memento originator; must not be {@code null}.
-   * @param version The version of the memento to export.
+   * @param schemaVersion The schema version of the memento to export.
    *
    * @return The exported memento; never {@code null}.
    *
    * @throws MementoExportException If an error occurs while exporting the memento.
    */
-  public PropertyBagMemento exportMemento(final T originator, final long version) throws MementoExportException {
+  public PropertyBagMemento exportMemento(final T originator, final long schemaVersion) throws MementoExportException {
     checkNotNull(originator);
 
-    final Handler<T> handler = handlerSupplier.getHandler(version)
-        .orElseThrow(() -> newUnsupportedVersionException(version));
+    final Handler<T> handler = handlerSupplier.getHandler(schemaVersion)
+        .orElseThrow(() -> newUnsupportedSchemaVersionException(schemaVersion));
     final Map<String, Object> propertiesByName = new HashMap<>();
     handler.exportProperties(originator, propertiesByName);
-    return new PropertyBagMemento(id, version, propertiesByName);
+    return new PropertyBagMemento(schemaId, schemaVersion, propertiesByName);
   }
 
-  private static MementoExportException newUnsupportedVersionException(final long version) {
-    return new MementoExportException(String.format("version %d is unsupported", version));
+  private static MementoExportException newUnsupportedSchemaVersionException(final long schemaVersion) {
+    return new MementoExportException(String.format("schema version %d is unsupported", schemaVersion));
   }
 
   /**
@@ -86,20 +87,20 @@ public final class PropertyBagMementoExporter<T> implements MementoExporter<T> {
   }
 
   /**
-   * Supplies memento export handlers for each supported version.
+   * Supplies memento export handlers for each supported schema version.
    *
    * @param <T> The type of the memento originator.
    */
   @FunctionalInterface
   public interface HandlerSupplier<T> {
     /**
-     * Gets the memento export handler for the specified version.
+     * Gets the memento export handler for the specified schema version.
      *
-     * @param version The memento version to export.
+     * @param schemaVersion The memento schema version to export.
      *
-     * @return The memento export handler for the specified version or empty if no handler is available; never
+     * @return The memento export handler for the specified schema version or empty if no handler is available; never
      *         {@code null}.
      */
-    Optional<Handler<T>> getHandler(long version);
+    Optional<Handler<T>> getHandler(long schemaVersion);
   }
 }

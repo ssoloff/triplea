@@ -41,7 +41,7 @@ public final class SerializableMementoImportExportIntegrationTest {
   }
 
   private static Memento newMemento() {
-    return new PropertyBagMemento("id", 1L, ImmutableMap.<String, Object>of(
+    return new PropertyBagMemento("schema-id", 1L, ImmutableMap.<String, Object>of(
         "property1", 42,
         "property2", "2112"));
   }

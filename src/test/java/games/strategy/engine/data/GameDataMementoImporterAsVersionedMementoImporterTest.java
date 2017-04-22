@@ -37,7 +37,7 @@ public final class GameDataMementoImporterAsVersionedMementoImporterTest
 
   private static SupportedVersion<GameData> v1() {
     final GameData expected = TestGameDataFactory.newValidGameData();
-    final Memento memento = new PropertyBagMemento(GameDataMemento.ID, 1L, ImmutableMap.<String, Object>builder()
+    final Memento memento = new PropertyBagMemento(GameDataMemento.SCHEMA_ID, 1L, ImmutableMap.<String, Object>builder()
         .put("name", expected.getGameName())
         .put("version", expected.getGameVersion())
         // TODO: add remaining properties

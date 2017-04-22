@@ -18,23 +18,23 @@ import com.google.common.collect.ImmutableMap;
 import games.strategy.util.memento.PropertyBagMementoExporter.HandlerSupplier;
 
 public final class PropertyBagMementoExporterTest {
-  private static final long DEFAULT_VERSION = 42L;
+  private static final long DEFAULT_SCHEMA_VERSION = 42L;
 
-  private static final String ID = "id";
+  private static final String SCHEMA_ID = "schema-id";
 
   private final FakeOriginator originator = new FakeOriginator(42, "2112");
 
   @Test
-  public void exportMemento_ShouldReturnMementoWithDefaultVersion() throws Exception {
-    final PropertyBagMementoExporter<FakeOriginator> mementoExporter = newMementoExporterForAllVersions();
+  public void exportMemento_ShouldReturnMementoWithDefaultSchemaVersion() throws Exception {
+    final PropertyBagMementoExporter<FakeOriginator> mementoExporter = newMementoExporterForAllSchemaVersions();
 
     final PropertyBagMemento memento = mementoExporter.exportMemento(originator);
 
-    assertThat(memento.getVersion(), is(DEFAULT_VERSION));
+    assertThat(memento.getSchemaVersion(), is(DEFAULT_SCHEMA_VERSION));
   }
 
-  private static PropertyBagMementoExporter<FakeOriginator> newMementoExporterForAllVersions() {
-    return newMementoExporter(version -> Optional.of((originator, propertiesByName) -> {
+  private static PropertyBagMementoExporter<FakeOriginator> newMementoExporterForAllSchemaVersions() {
+    return newMementoExporter(schemaVersion -> Optional.of((originator, propertiesByName) -> {
       propertiesByName.put("field1", originator.field1);
       propertiesByName.put("field2", originator.field2);
     }));
@@ -42,24 +42,24 @@ public final class PropertyBagMementoExporterTest {
 
   private static PropertyBagMementoExporter<FakeOriginator> newMementoExporter(
       final HandlerSupplier<FakeOriginator> handlerSupplier) {
-    return new PropertyBagMementoExporter<>(ID, DEFAULT_VERSION, handlerSupplier);
+    return new PropertyBagMementoExporter<>(SCHEMA_ID, DEFAULT_SCHEMA_VERSION, handlerSupplier);
   }
 
   @Test
-  public void exportMementoWithVersion_ShouldReturnMementoWithSpecifiedIdAndVersion() throws Exception {
-    final long version = 2112L;
-    final PropertyBagMementoExporter<FakeOriginator> mementoExporter = newMementoExporterForAllVersions();
+  public void exportMementoWithSchemaVersion_ShouldReturnMementoWithSpecifiedSchemaIdAndVersion() throws Exception {
+    final long schemaVersion = 2112L;
+    final PropertyBagMementoExporter<FakeOriginator> mementoExporter = newMementoExporterForAllSchemaVersions();
 
-    final PropertyBagMemento memento = mementoExporter.exportMemento(originator, version);
+    final PropertyBagMemento memento = mementoExporter.exportMemento(originator, schemaVersion);
 
-    assertThat(memento.getId(), is(ID));
-    assertThat(memento.getVersion(), is(version));
+    assertThat(memento.getSchemaId(), is(SCHEMA_ID));
+    assertThat(memento.getSchemaVersion(), is(schemaVersion));
   }
 
   @Test
-  public void exportMementoWithVersion_ShouldReturnMementoWithOriginatorProperties() throws Exception {
+  public void exportMementoWithSchemaVersion_ShouldReturnMementoWithOriginatorProperties() throws Exception {
     final PropertyBagMemento expected = newMemento();
-    final PropertyBagMementoExporter<FakeOriginator> mementoExporter = newMementoExporterForAllVersions();
+    final PropertyBagMementoExporter<FakeOriginator> mementoExporter = newMementoExporterForAllSchemaVersions();
 
     final PropertyBagMemento memento = mementoExporter.exportMemento(originator, 1L);
 
@@ -67,24 +67,24 @@ public final class PropertyBagMementoExporterTest {
   }
 
   private PropertyBagMemento newMemento() {
-    return new PropertyBagMemento(ID, DEFAULT_VERSION, ImmutableMap.<String, Object>of(
+    return new PropertyBagMemento(SCHEMA_ID, DEFAULT_SCHEMA_VERSION, ImmutableMap.<String, Object>of(
         "field1", originator.field1,
         "field2", originator.field2));
   }
 
   @Test
-  public void exportMementoWithVersion_ShouldThrowExceptionIfVersionIsUnsupported() {
-    final long version = 2112L;
-    final PropertyBagMementoExporter<FakeOriginator> mementoExporter = newMementoExporterForNoVersions();
+  public void exportMementoWithSchemaVersion_ShouldThrowExceptionIfSchemaVersionIsUnsupported() {
+    final long schemaVersion = 2112L;
+    final PropertyBagMementoExporter<FakeOriginator> mementoExporter = newMementoExporterForNoSchemaVersions();
 
-    catchException(() -> mementoExporter.exportMemento(originator, version));
+    catchException(() -> mementoExporter.exportMemento(originator, schemaVersion));
 
     assertThat(caughtException(), allOf(
         is(instanceOf(MementoExportException.class)),
-        hasMessageThat(containsString(String.format("version %d is unsupported", version)))));
+        hasMessageThat(containsString(String.format("schema version %d is unsupported", schemaVersion)))));
   }
 
-  private static PropertyBagMementoExporter<FakeOriginator> newMementoExporterForNoVersions() {
-    return newMementoExporter(version -> Optional.empty());
+  private static PropertyBagMementoExporter<FakeOriginator> newMementoExporterForNoSchemaVersions() {
+    return newMementoExporter(schemaVersion -> Optional.empty());
   }
 }

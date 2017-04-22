@@ -27,7 +27,7 @@ public final class SerializableMementoExporterTest {
   private OutputStream os;
 
   private static Memento newMemento() {
-    return new PropertyBagMemento("id", 1L, Collections.emptyMap());
+    return new PropertyBagMemento("schema-id", 1L, Collections.emptyMap());
   }
 
   private static SerializableMementoExporter newMementoExporter() {

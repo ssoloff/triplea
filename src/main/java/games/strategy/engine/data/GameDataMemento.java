@@ -30,10 +30,10 @@ public final class GameDataMemento {
   }
 
   @VisibleForTesting
-  static final long CURRENT_VERSION = 1L;
+  static final long CURRENT_SCHEMA_VERSION = 1L;
 
   @VisibleForTesting
-  static final String ID = "application/x.triplea.game-data-memento";
+  static final String SCHEMA_ID = "application/x.triplea.game-data-memento";
 
   /**
    * An immutable collection of default memento export options.
@@ -71,7 +71,7 @@ public final class GameDataMemento {
   public static MementoExporter<GameData> newExporter(final Map<ExportOptionName, Object> optionsByName) {
     checkNotNull(optionsByName);
 
-    return new PropertyBagMementoExporter<>(ID, CURRENT_VERSION, new ExportHandlers(optionsByName));
+    return new PropertyBagMementoExporter<>(SCHEMA_ID, CURRENT_SCHEMA_VERSION, new ExportHandlers(optionsByName));
   }
 
   /**
@@ -85,7 +85,8 @@ public final class GameDataMemento {
   }
 
   private static final class ExportHandlers implements PropertyBagMementoExporter.HandlerSupplier<GameData> {
-    private final Map<Long, PropertyBagMementoExporter.Handler<GameData>> handlersByVersion = getHandlersByVersion();
+    private final Map<Long, PropertyBagMementoExporter.Handler<GameData>> handlersBySchemaVersion =
+        getHandlersBySchemaVersion();
 
     // TODO: add support for options
     @SuppressWarnings("unused")
@@ -95,7 +96,7 @@ public final class GameDataMemento {
       this.optionsByName = new HashMap<>(optionsByName);
     }
 
-    private Map<Long, PropertyBagMementoExporter.Handler<GameData>> getHandlersByVersion() {
+    private Map<Long, PropertyBagMementoExporter.Handler<GameData>> getHandlersBySchemaVersion() {
       return ImmutableMap.<Long, PropertyBagMementoExporter.Handler<GameData>>builder()
           .put(1L, this::exportPropertiesV1)
           .build();
@@ -108,8 +109,8 @@ public final class GameDataMemento {
     }
 
     @Override
-    public Optional<PropertyBagMementoExporter.Handler<GameData>> getHandler(final long version) {
-      return Optional.ofNullable(handlersByVersion.get(version));
+    public Optional<PropertyBagMementoExporter.Handler<GameData>> getHandler(final long schemaVersion) {
+      return Optional.ofNullable(handlersBySchemaVersion.get(schemaVersion));
     }
   }
 
@@ -119,13 +120,14 @@ public final class GameDataMemento {
    * @return A new game data memento importer; never {@code null}.
    */
   public static MementoImporter<GameData> newImporter() {
-    return new PropertyBagMementoImporter<>(ID, new ImportHandlers());
+    return new PropertyBagMementoImporter<>(SCHEMA_ID, new ImportHandlers());
   }
 
   private static final class ImportHandlers implements PropertyBagMementoImporter.HandlerSupplier<GameData> {
-    private final Map<Long, PropertyBagMementoImporter.Handler<GameData>> handlersByVersion = getHandlersByVersion();
+    private final Map<Long, PropertyBagMementoImporter.Handler<GameData>> handlersBySchemaVersion =
+        getHandlersBySchemaVersion();
 
-    private Map<Long, PropertyBagMementoImporter.Handler<GameData>> getHandlersByVersion() {
+    private Map<Long, PropertyBagMementoImporter.Handler<GameData>> getHandlersBySchemaVersion() {
       return ImmutableMap.<Long, PropertyBagMementoImporter.Handler<GameData>>builder()
           .put(1L, this::importPropertiesV1)
           .build();
@@ -159,8 +161,8 @@ public final class GameDataMemento {
     }
 
     @Override
-    public Optional<PropertyBagMementoImporter.Handler<GameData>> getHandler(final long version) {
-      return Optional.ofNullable(handlersByVersion.get(version));
+    public Optional<PropertyBagMementoImporter.Handler<GameData>> getHandler(final long schemaVersion) {
+      return Optional.ofNullable(handlersBySchemaVersion.get(schemaVersion));
     }
   }
 }

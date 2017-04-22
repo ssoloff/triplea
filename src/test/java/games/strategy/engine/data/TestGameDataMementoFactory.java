@@ -35,7 +35,7 @@ public final class TestGameDataMementoFactory {
   }
 
   private static PropertyBagMemento newMementoWithProperties(final Map<String, Object> propertiesByName) {
-    return new PropertyBagMemento(GameDataMemento.ID, GameDataMemento.CURRENT_VERSION, propertiesByName);
+    return new PropertyBagMemento(GameDataMemento.SCHEMA_ID, GameDataMemento.CURRENT_SCHEMA_VERSION, propertiesByName);
   }
 
   /**

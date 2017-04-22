@@ -19,20 +19,20 @@ public final class PropertyBagMementoProxy implements Externalizable {
   private final VersionedProxySupport versionedProxySupport = new VersionedProxySupport(this);
 
   /**
-   * @serial The memento identifier; never {@code null}.
-   */
-  private String id;
-
-  /**
    * @serial The collection of originator properties; never {@code null}. The key is the property name. The value is the
    *         property value.
    */
   private Map<String, Object> propertiesByName;
 
   /**
-   * @serial The memento version.
+   * @serial The memento schema identifier; never {@code null}.
    */
-  private long version;
+  private String schemaId;
+
+  /**
+   * @serial The memento schema version.
+   */
+  private long schemaVersion;
 
   /**
    * Initializes a new instance of the {@code PropertyBagMementoProxy} class during deserialization.
@@ -48,19 +48,19 @@ public final class PropertyBagMementoProxy implements Externalizable {
   public PropertyBagMementoProxy(final PropertyBagMemento memento) {
     checkNotNull(memento);
 
-    id = memento.getId();
     propertiesByName = memento.getPropertiesByName();
-    version = memento.getVersion();
+    schemaId = memento.getSchemaId();
+    schemaVersion = memento.getSchemaVersion();
   }
 
   private Object readResolve() {
-    return new PropertyBagMemento(id, version, propertiesByName);
+    return new PropertyBagMemento(schemaId, schemaVersion, propertiesByName);
   }
 
   @SuppressWarnings("unused")
   private void readExternalV1(final ObjectInput in) throws IOException, ClassNotFoundException {
-    id = in.readUTF();
-    version = in.readLong();
+    schemaId = in.readUTF();
+    schemaVersion = in.readLong();
     @SuppressWarnings("unchecked")
     final Map<String, Object> propertiesByName = (Map<String, Object>) in.readObject();
     this.propertiesByName = propertiesByName;
@@ -78,8 +78,8 @@ public final class PropertyBagMementoProxy implements Externalizable {
 
   @SuppressWarnings("unused")
   private void writeExternalV1(final ObjectOutput out) throws IOException {
-    out.writeUTF(id);
-    out.writeLong(version);
+    out.writeUTF(schemaId);
+    out.writeLong(schemaVersion);
     out.writeObject(propertiesByName);
   }
 }
