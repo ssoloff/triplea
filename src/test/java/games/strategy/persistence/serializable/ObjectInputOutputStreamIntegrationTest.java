@@ -37,7 +37,7 @@ public final class ObjectInputOutputStreamIntegrationTest {
   }
 
   @Test
-  public void objectInputAndOutputStreams_ShouldBeAbleToRoundTripNull() throws Exception {
+  public void shouldBeAbleToRoundTripNull() throws Exception {
     writeObject(null);
     final Object deserializedObj = readObject();
 
@@ -45,7 +45,7 @@ public final class ObjectInputOutputStreamIntegrationTest {
   }
 
   @Test
-  public void objectInputAndOutputStreams_ShouldBeAbleToRoundTripSerializableObjectWithoutPersistenceDelegate()
+  public void shouldBeAbleToRoundTripSerializableObjectWithoutPersistenceDelegate()
       throws Exception {
     final Date obj = new Date();
 
@@ -56,7 +56,7 @@ public final class ObjectInputOutputStreamIntegrationTest {
   }
 
   @Test
-  public void objectInputAndOutputStreams_ShouldBeAbleToRoundTripNonSerializableObjectWithPersistenceDelegate()
+  public void shouldBeAbleToRoundTripNonSerializableObjectWithPersistenceDelegate()
       throws Exception {
     persistenceDelegateRegistry.registerPersistenceDelegate(
         FakeNonSerializableClass.class, new FakeNonSerializableClassPersistenceDelegate());
@@ -69,7 +69,7 @@ public final class ObjectInputOutputStreamIntegrationTest {
   }
 
   @Test
-  public void objectOutputStream_ShouldThrowExceptionWhenNoPersistenceDelegateRegisteredForNonSerializableObject()
+  public void shouldThrowExceptionWhenWritingNonSerializableObjectWithNoRegisteredPersistenceDelegate()
       throws Exception {
     catchException(() -> writeObject(new FakeNonSerializableClass(2112, "42")));
 
@@ -77,7 +77,7 @@ public final class ObjectInputOutputStreamIntegrationTest {
   }
 
   @Test
-  public void objectInputStream_ShouldNotThrowExceptionWhenNoPersistenceDelegateRegisteredForNonSerializableObject()
+  public void shouldNotThrowExceptionWhenReadingNonSerializableObjectWithNoRegisteredPersistenceDelegate()
       throws Exception {
     final PersistenceDelegate persistenceDelegate = new FakeNonSerializableClassPersistenceDelegate();
     persistenceDelegateRegistry.registerPersistenceDelegate(FakeNonSerializableClass.class, persistenceDelegate);
