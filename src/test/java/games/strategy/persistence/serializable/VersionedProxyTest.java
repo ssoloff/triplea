@@ -35,6 +35,7 @@ public final class VersionedProxyTest {
    * <pre>
    * private static final class FakeNonSerializableClassProxy implements Externalizable {
    *   private static final long serialVersionUID = 8158520333069502854L;
+   *
    *   private static final long CURRENT_VERSION = 1L;
    *
    *   private final VersionedProxySupport versionedProxySupport = new VersionedProxySupport(this);
@@ -110,7 +111,7 @@ public final class VersionedProxyTest {
    * </p>
    *
    * <ul>
-   * <li>{@code field1} now has type {@code int}; it previously had type {@code long}.</li>
+   * <li>{@code field1} now has type {@code long}; it previously had type {@code int}.</li>
    * <li>{@code field2} has been removed; it previously was of type {@code char}.</li>
    * <li>{@code field3} is unchanged.</li>
    * <li>{@code field4} is a new field; it previously did not exist.</li>
@@ -169,6 +170,7 @@ public final class VersionedProxyTest {
    */
   private static final class FakeNonSerializableClassProxy implements Externalizable {
     private static final long serialVersionUID = 8158520333069502854L;
+
     private static final long CURRENT_VERSION = 2L;
 
     static final double FIELD4_DEFAULT_VALUE = 3.5;
