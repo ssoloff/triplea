@@ -18,7 +18,7 @@ import java.io.InputStream;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import games.strategy.persistence.serializable.DefaultPersistenceDelegateRegistry;
 import games.strategy.persistence.serializable.ObjectOutputStream;
