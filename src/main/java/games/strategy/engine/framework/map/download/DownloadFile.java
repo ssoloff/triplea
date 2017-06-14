@@ -23,6 +23,7 @@ final class DownloadFile {
   DownloadFile(final DownloadFileDescription download, final DownloadListener downloadListener) {
     this.download = download;
     this.downloadListener = downloadListener;
+    downloadListener.downloadStarted(download);
   }
 
   DownloadFileDescription getDownload() {
@@ -49,8 +50,6 @@ final class DownloadFile {
    */
   private Thread createDownloadThread(final FileSizeWatcher watcher) {
     return new Thread(() -> {
-      downloadListener.downloadStarted(download);
-
       final File fileToDownloadTo = watcher.getFile();
       if (state != DownloadState.CANCELLED) {
         final String url = download.getUrl();
