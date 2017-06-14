@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import games.strategy.engine.ClientFileSystemHelper;
-import games.strategy.util.ThreadUtil;
 
 /**
  * Class that accepts and queues download requests. Download requests are started in background
@@ -64,12 +63,10 @@ final class DownloadCoordinator {
   private void updateQueue() {
     assert Thread.holdsLock(lock);
 
-    if (activeDownloads.size() < MAX_CONCURRENT_DOWNLOADS) {
+    if (activeDownloads.size() < MAX_CONCURRENT_DOWNLOADS && !pendingDownloads.isEmpty()) {
       final DownloadFile downloadFile = pendingDownloads.poll();
-      if (downloadFile != null) {
-        downloadFile.startAsyncDownload(ClientFileSystemHelper.createTempFile());
-        activeDownloads.add(downloadFile);
-      }
+      downloadFile.startAsyncDownload(ClientFileSystemHelper.createTempFile());
+      activeDownloads.add(downloadFile);
     }
   }
 
@@ -143,7 +140,6 @@ final class DownloadCoordinator {
             break;
           }
         }
-
         updateQueue();
       }
     }
