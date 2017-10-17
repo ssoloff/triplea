@@ -24,7 +24,14 @@ public class RepairFrontier extends DefaultNamed implements Iterable<RepairRule>
     m_rules = new ArrayList<>(rules);
   }
 
-  void addRule(final RepairRule rule) {
+  /**
+   * Adds the specified repair rule.
+   *
+   * @param rule The repair rule to add.
+   *
+   * @throws IllegalStateException If {@code rule} was already added.
+   */
+  public void addRule(final RepairRule rule) {
     if (m_rules.contains(rule)) {
       throw new IllegalStateException("Rule already added:" + rule);
     }

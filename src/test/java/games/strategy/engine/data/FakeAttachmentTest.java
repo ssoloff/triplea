@@ -7,6 +7,6 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 public final class FakeAttachmentTest {
   @Test
   public void shouldBeEquatableAndHashable() {
-    EqualsVerifier.forClass(FakeAttachment.class).verify();
+    EqualsVerifier.forClass(FakeAttachment.class).withIgnoredFields("attachable").verify();
   }
 }

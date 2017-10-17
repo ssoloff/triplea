@@ -78,7 +78,7 @@ public final class IntegerMap<T> implements Cloneable, Serializable {
   /**
    * returns 0 if no key found.
    */
-  public int getInt(final T key) {
+  public int getInt(final Object key) {
     if (!mapValues.containsKey(key)) {
       return 0;
     }

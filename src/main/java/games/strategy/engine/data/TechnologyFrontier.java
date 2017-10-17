@@ -1,6 +1,7 @@
 package games.strategy.engine.data;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -40,7 +41,7 @@ public class TechnologyFrontier extends GameDataComponent implements Iterable<Te
     reorderTechsToMatchGameTechsOrder();
   }
 
-  public void addAdvance(final List<TechAdvance> list) {
+  public void addAdvance(final Collection<TechAdvance> list) {
     for (final TechAdvance t : list) {
       addAdvance(t);
     }

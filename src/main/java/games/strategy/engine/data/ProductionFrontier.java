@@ -16,6 +16,7 @@ public class ProductionFrontier extends DefaultNamed implements Iterable<Product
     this(name, data, Collections.emptyList());
   }
 
+  // TODO: remove when old serializable proxy framework is removed
   public ProductionFrontier(final String name, final GameData data, final List<ProductionRule> rules) {
     super(name, data);
 

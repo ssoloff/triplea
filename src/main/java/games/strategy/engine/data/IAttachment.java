@@ -2,6 +2,8 @@ package games.strategy.engine.data;
 
 import java.io.Serializable;
 
+// XXX !!!!! attachments aren't really game data components... not sure why DefaultAttachment extends
+// GameDataComponent.  we can safely assume they do not need a GameData back reference!!!
 public interface IAttachment extends Serializable {
   /** each implementing class NEEDS to have such an constructor, otherwise the parsing in GameParser won't work */
   Class<?>[] attachmentConstructorParameter = new Class<?>[] {String.class, Attachable.class, GameData.class};
