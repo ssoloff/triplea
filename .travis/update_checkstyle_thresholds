@@ -30,9 +30,10 @@ should_skip_build() {
   #   skip=$TRUE
   # fi
   # if [[ "$TRAVIS_BRANCH" != "master" ]]; then
-  #   echo "  ...skipping because this branch is not permitted."
-  #   skip=$TRUE
-  # fi
+  if [[ "$TRAVIS_BRANCH" != "checkstyle-update-thresholds-via-pull-request" ]]; then
+    echo "  ...skipping because this branch is not permitted."
+    skip=$TRUE
+  fi
   # if [[ "$TRAVIS_REPO_SLUG" != "triplea-game/triplea" ]]; then
   #   echo "  ...skipping because this repo is not permitted."
   #   skip=$TRUE
