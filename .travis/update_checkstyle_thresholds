@@ -38,6 +38,10 @@ should_skip_build() {
   #   echo "  ...skipping because this repo is not permitted."
   #   skip=$TRUE
   # fi
+  if [[ "$TRIPLEA_RELEASE" != "true" ]]; then
+    echo "  ...skipping because this is not the release build."
+    skip=$TRUE
+  fi
   return $skip
 }
 
