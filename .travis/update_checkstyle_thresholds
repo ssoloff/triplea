@@ -1,5 +1,5 @@
 #!/bin/bash
-#
+# TODO: append -e to above command?
 # This script updates the Checkstyle thresholds based on the most recent
 # Checkstyle run (therefore, this script must be run after the Gradle "check"
 # task has run).  If the thresholds have changed, the updated thresholds are
@@ -24,18 +24,19 @@ main() {
 should_skip_build() {
   echo "Checking if Checkstyle thresholds should be updated for this build..."
   local skip=$FALSE
-  if [[ "$TRAVIS_PULL_REQUEST" != "false" ]]; then
-    echo "  ...skipping because pull requests are not permitted."
-    skip=$TRUE
-  fi
-  if [[ "$TRAVIS_BRANCH" != "master" ]]; then
-    echo "  ...skipping because this branch is not permitted."
-    skip=$TRUE
-  fi
-  if [[ "$TRAVIS_REPO_SLUG" != "triplea-game/triplea" ]]; then
-    echo "  ...skipping because this repo is not permitted."
-    skip=$TRUE
-  fi
+  # TODO: undo temporary disable
+  # if [[ "$TRAVIS_PULL_REQUEST" != "false" ]]; then
+  #   echo "  ...skipping because pull requests are not permitted."
+  #   skip=$TRUE
+  # fi
+  # if [[ "$TRAVIS_BRANCH" != "master" ]]; then
+  #   echo "  ...skipping because this branch is not permitted."
+  #   skip=$TRUE
+  # fi
+  # if [[ "$TRAVIS_REPO_SLUG" != "triplea-game/triplea" ]]; then
+  #   echo "  ...skipping because this repo is not permitted."
+  #   skip=$TRUE
+  # fi
   return $skip
 }
 
@@ -74,26 +75,45 @@ has_local_thresholds_changed() {
 }
 
 update_remote_thresholds() {
-  echo "Pushing '$GRADLE_PROPERTIES' changes to '$TRAVIS_REPO_SLUG:$TRAVIS_BRANCH'..."
+  # echo "Pushing '$GRADLE_PROPERTIES' changes to '$TRAVIS_REPO_SLUG:$TRAVIS_BRANCH'..."
   local -r old_hash=$1
-  local -r update_request="{ \
-    \"message\": \"Bot: Update Checkstyle thresholds after build $TRAVIS_BUILD_NUMBER\", \
-    \"committer\": { \
-      \"name\": \"tripleabuilderbot\", \
-      \"email\": \"tripleabuilderbot@gmail.com\" \
-    }, \
-    \"branch\": \"$TRAVIS_BRANCH\", \
-    \"content\": \"$(base64 -w 0 $GRADLE_PROPERTIES)\", \
-    \"sha\": \"$old_hash\" \
+  # local -r update_request="{ \
+  #   \"message\": \"Bot: Update Checkstyle thresholds after build $TRAVIS_BUILD_NUMBER\", \
+  #   \"committer\": { \
+  #     \"name\": \"tripleabuilderbot\", \
+  #     \"email\": \"tripleabuilderbot@gmail.com\" \
+  #   }, \
+  #   \"branch\": \"$TRAVIS_BRANCH\", \
+  #   \"content\": \"$(base64 -w 0 $GRADLE_PROPERTIES)\", \
+  #   \"sha\": \"$old_hash\" \
+  # }"
+  # curl \
+  #     --silent \
+  #     --show-error \
+  #     -X PUT \
+  #     --header "Accept: application/vnd.github.v3+json" \
+  #     --data "$update_request" \
+  #     --user ":$GITHUB_PERSONAL_ACCESS_TOKEN_FOR_TRAVIS" \
+  #     "https://api.github.com/repos/$TRAVIS_REPO_SLUG/contents/$GRADLE_PROPERTIES"
+
+  # TODO: extract to separate functions
+
+  # TODO: create a new branch from current master
+  local -r branch_name="checkstyle_update_thresholds_after_build_${TRAVIS_BUILD_NUMBER}"
+  local -r branch_sha=$TRAVIS_COMMIT
+  echo "Creating branch '$branch_name' at SHA '$branch_sha'..."
+  local -r create_ref_request="{ \
+    \"ref\": \"refs/heads/$branch_name\", \
+    \"sha\": \"$branch_sha\"
   }"
+  # TODO: add       --silent \
   curl \
-      --silent \
       --show-error \
-      -X PUT \
+      -X POST \
       --header "Accept: application/vnd.github.v3+json" \
-      --data "$update_request" \
+      --data "$create_ref_request" \
       --user ":$GITHUB_PERSONAL_ACCESS_TOKEN_FOR_TRAVIS" \
-      "https://api.github.com/repos/$TRAVIS_REPO_SLUG/contents/$GRADLE_PROPERTIES"
+      "https://api.github.com/repos/$TRAVIS_REPO_SLUG/git/refs"
 }
 
 main
