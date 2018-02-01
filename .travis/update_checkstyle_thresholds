@@ -107,14 +107,34 @@ update_remote_thresholds() {
     \"ref\": \"refs/heads/$branch_name\", \
     \"sha\": \"$branch_sha\"
   }"
-  # TODO: add       --silent \
   curl \
+      --silent \
       --show-error \
       -X POST \
       --header "Accept: application/vnd.github.v3+json" \
       --data "$create_ref_request" \
       --user ":$GITHUB_PERSONAL_ACCESS_TOKEN_FOR_TRAVIS" \
       "https://api.github.com/repos/$TRAVIS_REPO_SLUG/git/refs"
+
+  # TODO: update gradle.properties on new branch
+  local -r update_file_request="{ \
+    \"message\": \"Bot: Update Checkstyle thresholds after build $TRAVIS_BUILD_NUMBER\", \
+    \"committer\": { \
+      \"name\": \"tripleabuilderbot\", \
+      \"email\": \"tripleabuilderbot@gmail.com\" \
+    }, \
+    \"branch\": \"$branch_name\", \
+    \"content\": \"$(base64 -w 0 $GRADLE_PROPERTIES)\", \
+    \"sha\": \"$old_hash\" \
+  }"
+  # TODO: add --silent \
+  curl \
+      --show-error \
+      -X PUT \
+      --header "Accept: application/vnd.github.v3+json" \
+      --data "$update_file_request" \
+      --user ":$GITHUB_PERSONAL_ACCESS_TOKEN_FOR_TRAVIS" \
+      "https://api.github.com/repos/$TRAVIS_REPO_SLUG/contents/$GRADLE_PROPERTIES"
 }
 
 main
