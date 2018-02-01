@@ -101,6 +101,9 @@ update_remote_thresholds() {
   #     --user ":$GITHUB_PERSONAL_ACCESS_TOKEN_FOR_TRAVIS" \
   #     "https://api.github.com/repos/$TRAVIS_REPO_SLUG/contents/$GRADLE_PROPERTIES"
 
+  # TODO: note that running these commands separately is going to trigger three different builds:
+  # two for the branch creation and new commit and one for the PR
+
   # TODO: extract to separate functions
 
   # TODO: create a new branch from current master
@@ -131,14 +134,31 @@ update_remote_thresholds() {
     \"content\": \"$(base64 -w 0 $GRADLE_PROPERTIES)\", \
     \"sha\": \"$old_hash\" \
   }"
-  # TODO: add --silent \
   curl \
+      --silent \
       --show-error \
       -X PUT \
       --header "Accept: application/vnd.github.v3+json" \
       --data "$update_file_request" \
       --user ":$GITHUB_PERSONAL_ACCESS_TOKEN_FOR_TRAVIS" \
       "https://api.github.com/repos/$TRAVIS_REPO_SLUG/contents/$GRADLE_PROPERTIES"
+
+  # TODO: open PR
+  local -r create_pr_request="{ \
+    \"title\": \"Bot: Update Checkstyle thresholds after build $TRAVIS_BUILD_NUMBER\", \
+    \"head\": \"$branch_name\",
+    \"base\": \"master\",
+    \"body\": \"**Note to reviewer:** Please delete the PR branch after merging.\",
+    \"maintainer_can_modify\": true
+  }"
+  # TODO: add --silent \
+  curl \
+      --show-error \
+      -X POST \
+      --header "Accept: application/vnd.github.v3+json" \
+      --data "$create_pr_request" \
+      --user ":$GITHUB_PERSONAL_ACCESS_TOKEN_FOR_TRAVIS" \
+      "https://api.github.com/repos/$TRAVIS_REPO_SLUG/pulls"
 }
 
 main
